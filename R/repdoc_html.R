@@ -8,7 +8,6 @@
 #' @export
 repdoc_html <- function(...) {
 
-
   # knitr options --------------------------------------------------------------
 
   # https://yihui.name/knitr/hooks/#option-hooks
@@ -40,6 +39,25 @@ repdoc_html <- function(...) {
     lines_in <- readLines(input)
     tmpfile <- file.path(tempdir(), basename(input))
     lines_out <- lines_in
+
+    # Set seed at beginning
+    header <- rmarkdown::yaml_front_matter(input)
+    if (!is.null(header$seed) && is.numeric(header$seed)) {
+      seed <- header$seed
+    } else {
+      seed <- 12345
+    }
+    seed_chunk <- c("",
+                    "```{r seed-set-by-repdoc}",
+                    sprintf("set.seed(%d)", seed),
+                    "```",
+                    "")
+
+    header_delims <- stringr::str_which(lines_out, "^---|^\\.\\.\\.")
+    header_end <- header_delims[2]
+    lines_out <- c(lines_out[1:header_end],
+                   seed_chunk,
+                   lines_out[(header_end + 1):length(lines_out)])
 
     # Add session information at the end
     sessioninfo <- c("",

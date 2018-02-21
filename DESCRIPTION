@@ -14,5 +14,6 @@ Depends:
     rmarkdown (>= 1.7)
 Imports:
     git2r (<= 0.21.0),
-    knitr
+    knitr,
+    stringr
 RoxygenNote: 6.0.1
