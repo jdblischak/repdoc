@@ -9,3 +9,10 @@ Description: Does the following: 1) sets a seed, 2) inserts version of Git repo,
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.2.5),
+    rmarkdown (>= 1.7)
+Imports:
+    git2r (<= 0.21.0),
+    knitr
+RoxygenNote: 6.0.1
