@@ -1,0 +1,11 @@
+Package: repdoc
+Type: Package
+Title: Make your R Markdown analysis more reproducible
+Version: 0.0.0.9000
+Author: John Blischak
+Maintainer: John Blischak <jdblischak@gmail.com>
+Description: Does the following: 1) sets a seed, 2) inserts version of Git repo,
+    and 3) inserts sessionInfo.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
