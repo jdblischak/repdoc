@@ -40,6 +40,35 @@ repdoc_html <- function(...) {
     tmpfile <- file.path(tempdir(), basename(input))
     lines_out <- lines_in
 
+    header_delims <- stringr::str_which(lines_out, "^---|^\\.\\.\\.")
+    header_end <- header_delims[2]
+    insert_point <- header_end
+
+    # Insert information on the status of the Git repo
+    r <- git2r::repository()
+    log <- git2r::commits(r)
+    sha <- log[[1]]@sha
+    s <- git2r::status(r, ignored = TRUE, all_untracked = TRUE)
+    s <- Map(unlist, s)
+    s <- Map(function(x) if (!is.null(x)) paste0(git2r::workdir(r), x) else NA_character_, s)
+    if (normalizePath(input) %in% s$staged) {
+      rmd_status <- "**WARNING:** The R Markdown file had staged changes when the HTML was built"
+    } else if (normalizePath(input) %in% s$unstaged) {
+      rmd_status <- "**WARNING:** The R Markdown file had unstaged changes when the HTML was built"
+    } else if (normalizePath(input) %in% s$untracked) {
+      rmd_status <- "**WARNING:** The R Markdown file is untracked by Git"
+    } else if (normalizePath(input) %in% s$ignored) {
+      rmd_status <- "**WARNING:** The R Markdown file is ignored by Git"
+    } else {
+      rmd_status <- "**SUCCESS:** The R Markdown file is up-to-date"
+    }
+
+    lines_out <- c(lines_out[1:insert_point],
+                   rmd_status,
+                   lines_out[(insert_point + 1):length(lines_out)])
+    insert_point <- insert_point + length(rmd_status)
+
+
     # Set seed at beginning
     header <- rmarkdown::yaml_front_matter(input)
     if (!is.null(header$seed) && is.numeric(header$seed)) {
@@ -53,11 +82,10 @@ repdoc_html <- function(...) {
                     "```",
                     "")
 
-    header_delims <- stringr::str_which(lines_out, "^---|^\\.\\.\\.")
-    header_end <- header_delims[2]
-    lines_out <- c(lines_out[1:header_end],
+    lines_out <- c(lines_out[1:insert_point],
                    seed_chunk,
-                   lines_out[(header_end + 1):length(lines_out)])
+                   lines_out[(insert_point + 1):length(lines_out)])
+    insert_point <- insert_point + length(seed_chunk)
 
     # Add session information at the end
     sessioninfo <- c("",
