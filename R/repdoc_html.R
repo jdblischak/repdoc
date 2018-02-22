@@ -52,15 +52,20 @@ repdoc_html <- function(...) {
     s <- Map(unlist, s)
     s <- Map(function(x) if (!is.null(x)) paste0(git2r::workdir(r), x) else NA_character_, s)
     if (normalizePath(input) %in% s$staged) {
-      rmd_status <- "**WARNING:** The R Markdown file had staged changes when the HTML was built"
+      rmd_status <- paste(clisymbols::symbol$cross,
+                          "**WARNING:** The R Markdown file had staged changes when the HTML was built")
     } else if (normalizePath(input) %in% s$unstaged) {
-      rmd_status <- "**WARNING:** The R Markdown file had unstaged changes when the HTML was built"
+      rmd_status <- paste(clisymbols::symbol$cross,
+                          "**WARNING:** The R Markdown file had unstaged changes when the HTML was built")
     } else if (normalizePath(input) %in% s$untracked) {
-      rmd_status <- "**WARNING:** The R Markdown file is untracked by Git"
+      rmd_status <- paste(clisymbols::symbol$cross,
+                          "**WARNING:** The R Markdown file is untracked by Git")
     } else if (normalizePath(input) %in% s$ignored) {
-      rmd_status <- "**WARNING:** The R Markdown file is ignored by Git"
+      rmd_status <- paste(clisymbols::symbol$cross,
+                          "**WARNING:** The R Markdown file is ignored by Git")
     } else {
-      rmd_status <- "**SUCCESS:** The R Markdown file is up-to-date"
+      rmd_status <- paste(clisymbols::symbol$tick,
+                          "**SUCCESS:** The R Markdown file is up-to-date")
     }
 
     lines_out <- c(lines_out[1:insert_point],

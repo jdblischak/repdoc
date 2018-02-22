@@ -13,6 +13,7 @@ Depends:
     R (>= 3.2.5),
     rmarkdown (>= 1.7)
 Imports:
+    clisymbols,
     git2r (<= 0.21.0),
     knitr,
     stringr
