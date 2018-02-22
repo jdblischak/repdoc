@@ -4,7 +4,7 @@
 #' \code{\link{set.seed}}, 2) inserts version of Git repo, and 3) inserts
 #' \code{\link{sessionInfo}}.
 #'
-#' @param ...
+#' @param ... Arguments passed to \code{\link[rmarkdown]{html_document}}
 #'
 #' @return \code{\link[rmarkdown]{output_format}}
 #'

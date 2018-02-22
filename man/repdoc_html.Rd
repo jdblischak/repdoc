@@ -7,7 +7,7 @@
 repdoc_html(...)
 }
 \arguments{
-\item{...}{}
+\item{...}{Arguments passed to \code{\link[rmarkdown]{html_document}}}
 }
 \value{
 \code{\link[rmarkdown]{output_format}}
