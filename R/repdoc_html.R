@@ -38,41 +38,48 @@ repdoc_html <- function(...) {
 
     lines_in <- readLines(input)
     tmpfile <- file.path(tempdir(), basename(input))
-    lines_out <- lines_in
+    e$knit_input <- tmpfile
 
-    header_delims <- stringr::str_which(lines_out, "^---|^\\.\\.\\.")
+    header_delims <- stringr::str_which(lines_in, "^---|^\\.\\.\\.")
     header_end <- header_delims[2]
     insert_point <- header_end
 
+    # Start reproducibility report
+    report <- c("**Reproducibility report:**",
+                sprintf("Results last updated on %s", Sys.Date()))
+
     # Insert information on the status of the Git repo
-    r <- git2r::repository()
-    log <- git2r::commits(r)
-    sha <- log[[1]]@sha
-    s <- git2r::status(r, ignored = TRUE, all_untracked = TRUE)
-    s <- Map(unlist, s)
-    s <- Map(function(x) if (!is.null(x)) paste0(git2r::workdir(r), x) else NA_character_, s)
-    if (normalizePath(input) %in% s$staged) {
-      rmd_status <- paste(clisymbols::symbol$cross,
-                          "**WARNING:** The R Markdown file had staged changes when the HTML was built")
-    } else if (normalizePath(input) %in% s$unstaged) {
-      rmd_status <- paste(clisymbols::symbol$cross,
-                          "**WARNING:** The R Markdown file had unstaged changes when the HTML was built")
-    } else if (normalizePath(input) %in% s$untracked) {
-      rmd_status <- paste(clisymbols::symbol$cross,
-                          "**WARNING:** The R Markdown file is untracked by Git")
-    } else if (normalizePath(input) %in% s$ignored) {
-      rmd_status <- paste(clisymbols::symbol$cross,
-                          "**WARNING:** The R Markdown file is ignored by Git")
+    if (git2r::in_repository()) {
+      r <- git2r::repository()
+      log <- git2r::commits(r)
+      sha <- log[[1]]@sha
+      commit_status <- sprintf("These results were generated with revision %s",
+                               stringr::str_sub(sha, 1, 7))
+      report <- c(report, commit_status)
+      s <- git2r::status(r, ignored = TRUE, all_untracked = TRUE)
+      s <- Map(unlist, s)
+      s <- Map(function(x) if (!is.null(x)) paste0(git2r::workdir(r), x) else NA_character_, s)
+      if (normalizePath(input) %in% s$staged) {
+        rmd_status <- paste(clisymbols::symbol$cross,
+                            "**WARNING:** The R Markdown file had staged changes when the HTML was built")
+      } else if (normalizePath(input) %in% s$unstaged) {
+        rmd_status <- paste(clisymbols::symbol$cross,
+                            "**WARNING:** The R Markdown file had unstaged changes when the HTML was built")
+      } else if (normalizePath(input) %in% s$untracked) {
+        rmd_status <- paste(clisymbols::symbol$cross,
+                            "**WARNING:** The R Markdown file is untracked by Git")
+      } else if (normalizePath(input) %in% s$ignored) {
+        rmd_status <- paste(clisymbols::symbol$cross,
+                            "**WARNING:** The R Markdown file is ignored by Git")
+      } else {
+        rmd_status <- paste(clisymbols::symbol$tick,
+                            "**SUCCESS:** The R Markdown file is up-to-date")
+      }
     } else {
-      rmd_status <- paste(clisymbols::symbol$tick,
-                          "**SUCCESS:** The R Markdown file is up-to-date")
+      rmd_status <- paste(clisymbols::symbol$cross,
+                          "**WARNING:** This project has no version control")
     }
-
-    lines_out <- c(lines_out[1:insert_point],
-                   rmd_status,
-                   lines_out[(insert_point + 1):length(lines_out)])
-    insert_point <- insert_point + length(rmd_status)
-
+    report <- c(report, rmd_status)
 
     # Set seed at beginning
     header <- rmarkdown::yaml_front_matter(input)
@@ -82,15 +89,14 @@ repdoc_html <- function(...) {
       seed <- 12345
     }
     seed_chunk <- c("",
-                    "```{r seed-set-by-repdoc}",
+                    "```{r seed-set-by-repdoc, echo = FALSE}",
                     sprintf("set.seed(%d)", seed),
                     "```",
                     "")
-
-    lines_out <- c(lines_out[1:insert_point],
-                   seed_chunk,
-                   lines_out[(insert_point + 1):length(lines_out)])
-    insert_point <- insert_point + length(seed_chunk)
+    seed_status <- paste(clisymbols::symbol$tick,
+                         sprintf("**SUCCESS:** This analysis was run with the seed %d",
+                                 seed))
+    report <- c(report, seed_status)
 
     # Add session information at the end
     sessioninfo <- c("",
@@ -100,10 +106,18 @@ repdoc_html <- function(...) {
                      "sessionInfo()",
                      "```",
                      "")
-    lines_out <- c(lines_out, sessioninfo)
+    sinfo_status <- paste(clisymbols::symbol$tick,
+                         "**SUCCESS:** The session information was recorded at the end of the analysis")
+    report <- c(report, sinfo_status)
+
+    report <- paste0("<p>", report, "</p>")
+    lines_out <- c(lines_in[1:header_end],
+                   report,
+                   seed_chunk,
+                   lines_in[(header_end + 1):length(lines_in)],
+                   sessioninfo)
 
     writeLines(lines_out, tmpfile)
-    e$knit_input <- tmpfile
   }
 
   # post_knit function ---------------------------------------------------------
