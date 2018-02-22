@@ -113,6 +113,7 @@ repdoc_html <- function(...) {
     report <- paste0("<p>", report, "</p>")
     lines_out <- c(lines_in[1:header_end],
                    report,
+                   "---",
                    seed_chunk,
                    lines_in[(header_end + 1):length(lines_in)],
                    sessioninfo)
