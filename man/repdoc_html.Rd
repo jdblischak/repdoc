@@ -13,5 +13,7 @@ repdoc_html(...)
 \code{\link[rmarkdown]{output_format}}
 }
 \description{
-Reproducible HTML document
+The output format \code{repdoc_html} automatically 1) sets a seed with
+\code{\link{set.seed}}, 2) inserts version of Git repo, and 3) inserts
+\code{\link{sessionInfo}}.
 }

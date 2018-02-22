@@ -1,5 +1,9 @@
 #' Reproducible HTML document
 #'
+#' The output format \code{repdoc_html} automatically 1) sets a seed with
+#' \code{\link{set.seed}}, 2) inserts version of Git repo, and 3) inserts
+#' \code{\link{sessionInfo}}.
+#'
 #' @param ...
 #'
 #' @return \code{\link[rmarkdown]{output_format}}
@@ -40,7 +44,7 @@ repdoc_html <- function(...) {
     tmpfile <- file.path(tempdir(), basename(input))
     e$knit_input <- tmpfile
 
-    header_delims <- stringr::str_which(lines_in, "^---|^\\.\\.\\.")
+    header_delims <- stringr::str_which(lines_in, "^-{3}|^\\.{3}")
     header_end <- header_delims[2]
     insert_point <- header_end
 
