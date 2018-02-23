@@ -36,6 +36,8 @@ repdoc_site <- function(input, encoding = getOption("encoding"), ...) {
                      quiet,
                      encoding, ...) {
 
+    input <- normalizePath(input)
+
     if (is.null(input_file)) {
       files <- list.files(input, pattern = "^[^_].*\\.[Rr]md$")
       files <- file.path(input, files)
@@ -60,11 +62,6 @@ repdoc_site <- function(input, encoding = getOption("encoding"), ...) {
     output_options <- list(self_contained = FALSE,
                            lib_dir = "site_libs")
 
-    move_safe <- function(from, to, overwrite = TRUE, recursive = dir.exists(to)) {
-      file.copy(from, to, overwrite = overwrite, recursive = recursive)
-      unlink(from, recursive = TRUE)
-    }
-
     for (f in files) {
       suppressMessages(
         output_file <- rmarkdown::render(f,
@@ -75,21 +72,31 @@ repdoc_site <- function(input, encoding = getOption("encoding"), ...) {
                                          quiet = quiet,
                                          encoding = encoding)
       )
-      move_safe(output_file, output_dir)
-      output_file <- file.path(output_dir, basename(output_file))
-      # Move site libraries
-      move_safe(file.path(input, "site_libs"), output_dir)
-      # Move figures
-      fig_dir <- file.path(input, "figure", basename(f))
-      if (dir.exists(fig_dir)) {
-        fig_output_dir <- file.path(output_dir, "figure")
-        dir.create(fig_output_dir,showWarnings = FALSE)
-        move_safe(fig_dir, fig_output_dir)
+
+      if (output_dir != input) {
+        # Move HTML file
+        file.copy(output_file, output_dir, overwrite = TRUE)
+        unlink(output_file)
+        output_file <- file.path(output_dir, basename(output_file))
+
+        # Move figures
+        fig_dir <- file.path(input, "figure", basename(f))
+        if (dir.exists(fig_dir)) {
+          fig_output_dir <- file.path(output_dir, "figure")
+          dir.create(fig_output_dir, showWarnings = FALSE)
+          file.copy(fig_dir, fig_output_dir, recursive = TRUE)
+          unlink(fig_dir, recursive = TRUE)
+        }
       }
     }
 
-    # Delete figure directory
+    # Clean up source directory
     if (output_dir != input) {
+      # Move site libraries
+      site_libs <- file.path(input, "site_libs")
+      file.copy(site_libs, output_dir, recursive = TRUE)
+      unlink(site_libs, recursive = TRUE)
+      # Remove figure directory
       unlink(file.path(input, "figure"), recursive = TRUE)
     }
 
