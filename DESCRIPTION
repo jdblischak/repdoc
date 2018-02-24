@@ -16,6 +16,7 @@ Imports:
     clisymbols,
     git2r (<= 0.21.0),
     knitr,
+    rprojroot,
     stringr,
     yaml
 RoxygenNote: 6.0.1

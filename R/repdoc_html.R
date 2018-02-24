@@ -38,7 +38,9 @@ repdoc_html <- function(...) {
     e <- frames[[length(frames) - 2]]
 
     # Set knit_root_dir to the location of the original file
-    e$knit_root_dir <- dirname(normalizePath(input))
+    if (is.null(e$knit_root_dir)) {
+      e$knit_root_dir <- dirname(normalizePath(input))
+    }
 
     lines_in <- readLines(input)
     tmpfile <- file.path(tempdir(), basename(input))
