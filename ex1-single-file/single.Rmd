@@ -1,7 +1,9 @@
 ---
 title: 'Demo of repdoc'
 author: "Author name"
-seed: 3
+repdoc:
+  seed: 3
+  knit_root_dir: "."
 output: repdoc::repdoc_html
 ---
 

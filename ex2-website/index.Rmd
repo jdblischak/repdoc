@@ -1,5 +1,8 @@
 ---
 title: "Homepage"
+repdoc:
+  seed: 8
+  knit_root_dir: /tmp
 site: repdoc::repdoc_site
 ---
 

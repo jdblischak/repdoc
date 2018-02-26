@@ -37,14 +37,63 @@ repdoc_html <- function(...) {
     frames <- sys.frames()
     e <- frames[[length(frames) - 2]]
 
-    # Set knit_root_dir to the location of the original file
-    if (is.null(e$knit_root_dir)) {
-      e$knit_root_dir <- dirname(normalizePath(input))
-    }
-
     lines_in <- readLines(input)
     tmpfile <- file.path(tempdir(), basename(input))
     e$knit_input <- tmpfile
+
+    # Default repdoc options
+    repdoc_opts <- list(knit_root_dir = NULL,
+                        seed = 12345,
+                        github = NA_character_)
+
+    # Get options from a potential _repdoc.yml file
+    repdoc_root <- try(rprojroot::find_root(rprojroot::has_file("_repdoc.yml"),
+                                            path = dirname(input)), silent = TRUE)
+    if (class(repdoc_root) != "try-error") {
+      repdoc_yml <- file.path(repdoc_root, "_repdoc.yml")
+      repdoc_yml_opts <- yaml::yaml.load_file(repdoc_yml)
+      for (opt in names(repdoc_yml_opts)) {
+        repdoc_opts[[opt]] <- repdoc_yml_opts[[opt]]
+      }
+      # If knit_root_dir is a relative path, interpret it as relative to the
+      # location of _repdoc.yml
+      if (!is.null(repdoc_opts$knit_root_dir)) {
+        if (!fs::is_absolute_path(repdoc_opts$knit_root_dir)) {
+          repdoc_opts$knit_root_dir <- fs::path_abs(file.path(repdoc_root,
+                                                              repdoc_opts$knit_root_dir))
+        }
+      }
+    }
+
+    # Get potential options from YAML header. These override the options
+    # specified in _repdoc.yml.
+    header <- rmarkdown::yaml_front_matter(input)
+    header_opts <- header$repdoc
+    for (opt in names(header_opts)) {
+      repdoc_opts[[opt]] <- header_opts[[opt]]
+    }
+    # If knit_root_dir was specified as a relative path in the YAML header,
+    # interpret it as relative to the location of the file
+    if (!is.null(repdoc_opts$knit_root_dir)) {
+      if (!fs::is_absolute_path(repdoc_opts$knit_root_dir)) {
+        repdoc_opts$knit_root_dir <- fs::path_abs(file.path(dirname(input),
+                                                            repdoc_opts$knit_root_dir))
+      }
+    }
+
+    # If knit_root_dir hasn't been configured in _repdoc.yml or the YAML header,
+    # set it to the location of the original file
+    if (is.null(repdoc_opts$knit_root_dir)) {
+      repdoc_opts$knit_root_dir <- dirname(normalizePath(input))
+    }
+
+    # Set the knit_root_dir option for rmarkdown::render. However, the user
+    # override the knit_root_dir option by passing it directly to render.
+    if (is.null(e$knit_root_dir)) {
+      e$knit_root_dir <- repdoc_opts$knit_root_dir
+    } else {
+      repdoc_opts$knit_root_dir <- e$knit_root_dir
+    }
 
     header_delims <- stringr::str_which(lines_in, "^-{3}|^\\.{3}")
     header_end <- header_delims[2]
@@ -88,20 +137,14 @@ repdoc_html <- function(...) {
     report <- c(report, rmd_status)
 
     # Set seed at beginning
-    header <- rmarkdown::yaml_front_matter(input)
-    if (!is.null(header$seed) && is.numeric(header$seed)) {
-      seed <- header$seed
-    } else {
-      seed <- 12345
-    }
     seed_chunk <- c("",
                     "```{r seed-set-by-repdoc, echo = FALSE}",
-                    sprintf("set.seed(%d)", seed),
+                    sprintf("set.seed(%d)", repdoc_opts$seed),
                     "```",
                     "")
     seed_status <- paste(clisymbols::symbol$tick,
                          sprintf("**SUCCESS:** This analysis was run with the seed %d",
-                                 seed))
+                                 repdoc_opts$seed))
     report <- c(report, seed_status)
 
     # Add session information at the end

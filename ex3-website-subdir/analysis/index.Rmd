@@ -1,5 +1,7 @@
 ---
 title: "Homepage"
+repdoc:
+  seed: 5
 site: repdoc::repdoc_site
 ---
 

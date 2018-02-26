@@ -38,23 +38,6 @@ repdoc_site <- function(input, encoding = getOption("encoding"), ...) {
 
     input <- normalizePath(input)
 
-    # Get repdoc options
-    repdoc_root <- try(rprojroot::find_root(rprojroot::has_file("_repdoc.yml"),
-                                        path = input), silent = TRUE)
-    if (class(repdoc_root) != "try-error") {
-      repdoc_yml <- file.path(repdoc_root, "_repdoc.yml")
-      repdoc_opts <- yaml::yaml.load_file(repdoc_yml)
-    } else {
-      repdoc_opts <- list()
-    }
-
-    # Set knit_root_dir
-    if (is.null(repdoc_opts$knit_root_dir)) {
-      knit_root_dir <- NULL
-    } else {
-      knit_root_dir <- normalizePath(file.path(repdoc_root, repdoc_opts$knit_root_dir))
-    }
-
     if (is.null(input_file)) {
       files <- list.files(input, pattern = "^[^_].*\\.[Rr]md$")
       files <- file.path(input, files)
@@ -76,6 +59,8 @@ repdoc_site <- function(input, encoding = getOption("encoding"), ...) {
     # For an R Markdown website, the output_options self_contained and lib_dir
     # must be set. Force them here instead of temporarily editing the _site.yml
     # file.
+    # To improve: only do this for HTML output:
+    # https://github.com/rstudio/rmarkdown/pull/1177
     output_options <- list(self_contained = FALSE,
                            lib_dir = "site_libs")
 
@@ -84,7 +69,7 @@ repdoc_site <- function(input, encoding = getOption("encoding"), ...) {
         output_file <- rmarkdown::render(f,
                                          output_format = output_format,
                                          output_options = output_options,
-                                         knit_root_dir = knit_root_dir,
+                                         knit_root_dir = NULL,
                                          envir = envir,
                                          quiet = quiet,
                                          encoding = encoding)
