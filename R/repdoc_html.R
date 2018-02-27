@@ -44,7 +44,7 @@ repdoc_html <- function(...) {
     # Default repdoc options
     repdoc_opts <- list(knit_root_dir = NULL,
                         seed = 12345,
-                        github = NA_character_)
+                        github = get_github_from_remote(dirname(input)))
 
     # Get options from a potential _repdoc.yml file
     repdoc_root <- try(rprojroot::find_root(rprojroot::has_file("_repdoc.yml"),
@@ -108,8 +108,15 @@ repdoc_html <- function(...) {
       r <- git2r::repository()
       log <- git2r::commits(r)
       sha <- log[[1]]@sha
-      commit_status <- sprintf("These results were generated with revision %s",
-                               stringr::str_sub(sha, 1, 7))
+      sha7 <- stringr::str_sub(sha, 1, 7)
+      if (!is.na(repdoc_opts$github)) {
+        commit_status <- sprintf("These results were generated with revision [%s](%s)",
+                                 sha7,
+                                 paste0(repdoc_opts$github, "/tree/", sha))
+      } else {
+        commit_status <- sprintf("These results were generated with revision %s",
+                                 sha7)
+      }
       report <- c(report, commit_status)
       s <- git2r::status(r, ignored = TRUE, all_untracked = TRUE)
       s <- Map(unlist, s)
@@ -141,12 +148,18 @@ repdoc_html <- function(...) {
       blobs <- git2r::odb_blobs(r)
       blobs$fname <- file.path(git2r::workdir(r), blobs$path, blobs$name)
       blobs$fname <- fs::path_abs(blobs$fname)
+      if (!is.na(repdoc_opts$github)) {
+        blobs$commit <- paste0("[", blobs$commit, "](", repdoc_opts$github,
+                               "/blob/", blobs$commit, "/", blobs$path, "/",
+                               blobs$name, ")")
+      }
       blobs_rmd <- blobs[blobs$fname == normalizePath(input),
                          c("commit", "author", "when")]
+
       blobs_rmd_table <- knitr::kable(blobs_rmd, format = "html", padding = 10,
                                       row.names = FALSE)
       blobs_rmd_report <- c("<details>",
-                            "<summary>Click here to see past versions of this file:</summary>",
+                            "<summary>Click here to see past versions of the R Markdown file:</summary>",
                             "<br>",
                             blobs_rmd_table,
                             "<br>",
