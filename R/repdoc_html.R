@@ -217,12 +217,31 @@ repdoc_html <- function(...) {
                                          runtime, encoding, ...)
   }
 
+
+  # pre_processor function -----------------------------------------------------
+
+  # Pass additional arguments to Pandoc
+  # --include-after-body include/footer.html
+  pre_processor <- function(metadata, input_file, runtime, knit_meta,
+                            files_dir, output_dir) {
+    fname_footer <- tempfile("footer", fileext = ".html")
+    footer <- c("<hr>",
+                "<p>",
+                "This reproducible <a href=\"http://rmarkdown.rstudio.com\">R Markdown</a> analysis was created with <a href=\"https://github.com/jdblischak/repdoc\">repdoc</a>",
+                "</p>",
+                "<hr>")
+    writeLines(footer, con = fname_footer)
+    args <- c("--include-after-body", fname_footer)
+    return(args)
+  }
+
   # Return ---------------------------------------------------------------------
 
   o <- rmarkdown::output_format(knitr = knitr,
                                 pandoc = pandoc_options(to = "html"),
                                 pre_knit = pre_knit,
                                 post_knit = post_knit,
+                                pre_processor = pre_processor,
                                 base_format = rmarkdown::html_document(...))
   return(o)
 }
