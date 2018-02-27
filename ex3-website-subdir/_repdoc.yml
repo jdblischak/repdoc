@@ -1,2 +1,3 @@
 seed: 3
 knit_root_dir: "."
+sessioninfo: "devtools::session_info()"

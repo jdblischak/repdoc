@@ -44,7 +44,8 @@ repdoc_html <- function(...) {
     # Default repdoc options
     repdoc_opts <- list(knit_root_dir = NULL,
                         seed = 12345,
-                        github = get_github_from_remote(dirname(input)))
+                        github = get_github_from_remote(dirname(input)),
+                        sessioninfo = "sessionInfo()")
 
     # Get options from a potential _repdoc.yml file
     repdoc_root <- try(rprojroot::find_root(rprojroot::has_file("_repdoc.yml"),
@@ -183,7 +184,7 @@ repdoc_html <- function(...) {
                      "## Session information",
                      "",
                      "```{r session-info-chunk-inserted-by-repdoc}",
-                     "sessionInfo()",
+                     repdoc_opts$sessioninfo,
                      "```",
                      "")
     sinfo_status <- paste(clisymbols::symbol$tick,
