@@ -136,6 +136,24 @@ repdoc_html <- function(...) {
     }
     report <- c(report, rmd_status)
 
+    # Add past versions
+    if (git2r::in_repository()) {
+      blobs <- git2r::odb_blobs(r)
+      blobs$fname <- file.path(git2r::workdir(r), blobs$path, blobs$name)
+      blobs$fname <- fs::path_abs(blobs$fname)
+      blobs_rmd <- blobs[blobs$fname == normalizePath(input),
+                         c("commit", "author", "when")]
+      blobs_rmd_table <- knitr::kable(blobs_rmd, format = "html", padding = 10,
+                                      row.names = FALSE)
+      blobs_rmd_report <- c("<details>",
+                            "<summary>Click here to see past versions of this file:</summary>",
+                            "<br>",
+                            blobs_rmd_table,
+                            "<br>",
+                            "</details>")
+      report <- c(report, blobs_rmd_report)
+    }
+
     # Set seed at beginning
     seed_chunk <- c("",
                     "```{r seed-set-by-repdoc, echo = FALSE}",
@@ -159,7 +177,8 @@ repdoc_html <- function(...) {
                          "**SUCCESS:** The session information was recorded at the end of the analysis")
     report <- c(report, sinfo_status)
 
-    report <- paste0("<p>", report, "</p>")
+    report <- ifelse(stringr::str_sub(report, 1, 1) != "<",
+                     paste0("<p>", report, "</p>"), report)
     lines_out <- c(lines_in[1:header_end],
                    report,
                    "---",
