@@ -14,6 +14,7 @@ repdoc_html <- function(...) {
 
   # knitr options --------------------------------------------------------------
 
+  # Save the figures in "figure/<basename-of-Rmd-file>/"
   # https://yihui.name/knitr/hooks/#option-hooks
   hook_fig_path <- function(options) {
     options$fig.path <- file.path("figure", knitr::current_input(), "")
@@ -27,6 +28,8 @@ repdoc_html <- function(...) {
 
   # pre_knit function ----------------------------------------------------------
 
+  # This function copies the R Markdown file to a temporary directory and then
+  # modifies it.
   pre_knit <- function(input, ...) {
 
     # Access parent environment. Have to go up 2 frames because of the function
@@ -88,7 +91,7 @@ repdoc_html <- function(...) {
       repdoc_opts$knit_root_dir <- dirname(normalizePath(input))
     }
 
-    # Set the knit_root_dir option for rmarkdown::render. However, the user
+    # Set the knit_root_dir option for rmarkdown::render. However, the user can
     # override the knit_root_dir option by passing it directly to render.
     if (is.null(e$knit_root_dir)) {
       e$knit_root_dir <- repdoc_opts$knit_root_dir
@@ -96,6 +99,7 @@ repdoc_html <- function(...) {
       repdoc_opts$knit_root_dir <- e$knit_root_dir
     }
 
+    # Find the end of the YAML header for inserting new lines
     header_delims <- stringr::str_which(lines_in, "^-{3}|^\\.{3}")
     header_end <- header_delims[2]
     insert_point <- header_end
@@ -122,6 +126,7 @@ repdoc_html <- function(...) {
       s <- git2r::status(r, ignored = TRUE, all_untracked = TRUE)
       s <- Map(unlist, s)
       s <- Map(function(x) if (!is.null(x)) paste0(git2r::workdir(r), x) else NA_character_, s)
+      # Determine current status of R Markdown file
       if (normalizePath(input) %in% s$staged) {
         rmd_status <- paste(clisymbols::symbol$cross,
                             "**WARNING:** The R Markdown file had staged changes when the HTML was built")
@@ -144,7 +149,7 @@ repdoc_html <- function(...) {
     }
     report <- c(report, rmd_status)
 
-    # Add past versions
+    # Add past versions of R Markdown file
     if (git2r::in_repository()) {
       blobs <- git2r::odb_blobs(r)
       blobs$fname <- file.path(git2r::workdir(r), blobs$path, blobs$name)
@@ -156,16 +161,17 @@ repdoc_html <- function(...) {
       }
       blobs_rmd <- blobs[blobs$fname == normalizePath(input),
                          c("commit", "author", "when")]
-
-      blobs_rmd_table <- knitr::kable(blobs_rmd, format = "html", padding = 10,
-                                      row.names = FALSE)
-      blobs_rmd_report <- c("<details>",
-                            "<summary>Click here to see past versions of the R Markdown file:</summary>",
-                            "<br>",
-                            blobs_rmd_table,
-                            "<br>",
-                            "</details>")
-      report <- c(report, blobs_rmd_report)
+      if (nrow(blobs_rmd) > 0) {
+        blobs_rmd_table <- knitr::kable(blobs_rmd, format = "html", padding = 10,
+                                        row.names = FALSE)
+        blobs_rmd_report <- c("<details>",
+                              "<summary>Click here to see past versions of the R Markdown file:</summary>",
+                              "<br>",
+                              blobs_rmd_table,
+                              "<br>",
+                              "</details>")
+        report <- c(report, blobs_rmd_report)
+      }
     }
 
     # Set seed at beginning
@@ -191,8 +197,10 @@ repdoc_html <- function(...) {
                          "**SUCCESS:** The session information was recorded at the end of the analysis")
     report <- c(report, sinfo_status)
 
+    # Add paragraph HTML tag to any lines that don't already have an HTML tag
     report <- ifelse(stringr::str_sub(report, 1, 1) != "<",
                      paste0("<p>", report, "</p>"), report)
+
     lines_out <- c(lines_in[1:header_end],
                    report,
                    "---",
@@ -205,6 +213,10 @@ repdoc_html <- function(...) {
 
   # post_knit function ---------------------------------------------------------
 
+  # This function adds the navigation bar for websites defined in either
+  # _navbar.html or _site.yml. Below I just fix the path to the input file that
+  # I had changed for pre_knit and then execute the post_knit from
+  # rmarkdown::html_document.
   post_knit <- function(metadata, input_file, runtime, encoding, ...) {
 
     # Change the input_file back to its original so that the post_knit defined
@@ -217,11 +229,9 @@ repdoc_html <- function(...) {
                                          runtime, encoding, ...)
   }
 
-
   # pre_processor function -----------------------------------------------------
 
-  # Pass additional arguments to Pandoc
-  # --include-after-body include/footer.html
+  # Pass additional arguments to Pandoc. I use this to add a custom footer.
   pre_processor <- function(metadata, input_file, runtime, knit_meta,
                             files_dir, output_dir) {
     fname_footer <- tempfile("footer", fileext = ".html")

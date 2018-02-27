@@ -1,3 +1,6 @@
+# If the user doesn't define a URL for a GitHub repo in the YAML header or
+# _repdoc.yml, determine the URL from the remote "origin". If this remote
+# doesn't exist, return NA.
 get_github_from_remote <- function(path) {
   # HTTPS: https://github.com/jdblischak/repdoc.git
   # SSH: git@github.com:jdblischak/repdoc.git
