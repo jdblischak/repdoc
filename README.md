@@ -63,9 +63,9 @@ the custom site generator `repdoc::repdoc_site` in the YAML header of the
 site: repdoc::repdoc_site
 ```
 
-## Example 3: An R Markdown website with a different knit direcotry
+## Example 3: An R Markdown website with a different knit directory
 
-The analysis in `ex2-website-subir` demonstrates how repdoc can additionally be
+The analysis in `ex3-website-subir` demonstrates how repdoc can additionally be
 used to set `knit_root_dir` across the R Markdown files. This facilitates
 organizing the R Markdown files into a subdirectory but still executing them
 from the root of the project. Furthermore, it uses `_repdoc.yml` to share repdoc
@@ -82,10 +82,10 @@ Markdown document.
 The custom output format `repdoc_html` extends `rmarkdown::html_document`.
 
 It sets knitr options, including modifying the path to save figures, by setting
-the `knitr` argument.
+the `knitr` argument of `output_format`.
 
-It adds a custom footer to the output HTML using the `pre_processor` argument to
-pass `--include-after-body` to Pandoc.
+It adds a custom footer to the output HTML using the `pre_processor` argument
+of `output_format` to pass `--include-after-body` to Pandoc.
 
 The above options follow the R Markdown documentation. In order to add code to
 chunks to the beginning of the file (to set the seed) and the end of the file
@@ -93,8 +93,9 @@ chunks to the beginning of the file (to set the seed) and the end of the file
 Markdown file before it is rendered. To accomplish this, it creates and modifies
 a temporary version of the R Markdown file, and then has `rmarkdown::render`
 build this temporary file by accessing the enclosing environment and changing
-the name of the input file. This is quite hacky, and I would love to know if
-there were a better way to accomplish this.
+the name of the input file. This is performed using the `post_knit` argument of
+`output_format`. This is quite hacky, and I would love to know if there were a
+better way to accomplish this.
 
 To set `knit_root_dir` from the YAML header or `_repdoc.yml`, `repdoc_html` uses
 the same environment trick that it uses to modify the input file. It changes the
@@ -102,9 +103,11 @@ argument `knit_root_dir` used by `render`.
 
 ### Custom site generator
 
-`repdoc_site` is a custom site generator for use with `repdoc_html` to create R Markdown websites.
+`repdoc_site` is a custom site generator for use with `repdoc_html` to create R
+Markdown websites.
 
-It knows that the figures file are written to `figure/<basename of Rmd file>`, so it moves these if there is an `output_dir` set in `_site.yml`.
+It knows that the figures file are written to `figure/<basename of Rmd file>`,
+so it moves these if there is an `output_dir` set in `_site.yml`.
 
 It automatically sets `self_contained: false` and `lib_dir: site_libs` by
 passing these to `render` via the `output_options` argument. This will throw an
@@ -117,7 +120,7 @@ build it by passing the output format directly to `render`, e.g.
 
 To share repdoc settings across multiple R Markdown files, create a file called
 `_repdoc.yml`. This file can be in the same directory as the R Markdown file or
-an upstream directory. If  relative filepath is used to set `knit_root_dir`,
+an upstream directory. If a relative filepath is used to set `knit_root_dir`,
 then this filepath is interpreted as relative to the location of the
 `_repdoc.yml` file. For example, in `ex3-website-subdir/`, `_repdoc.yml` sets
 `knit_root_dir` to `"."`. Thus the files are knit in `ex3-website-subdir/` and
