@@ -5,4 +5,5 @@ reproducibility settings across the website files. Specifically it sets the
 `knit_root_dir`. The R Markdown files are saved in `analysis/`, but the code is
 executed in the root of the website directory. It also uses
 `devtools::session_info()` instead of `sessionInfo()` by specifying this in
-`_repdoc.yml`.
+`_repdoc.yml`. Since it is a website, use `rmarkdown::render_site` or the
+RStudio Knit button to render the file.

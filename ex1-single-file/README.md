@@ -1,7 +1,8 @@
 # ex1: A single R Markdown file
 
 To add the reproducibility features to a single file, change the output format
-in the YAML header to `repdoc::repdoc_html`. This performs the following:
+in the YAML header to `repdoc::repdoc_html` and then render it with
+`rmarkdown::render`. This performs the following:
 
 1. Inserts the date the results were created
 1. Reports the revision of the Git repo (if in Git repo)

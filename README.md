@@ -27,8 +27,9 @@ devtools::install_github("jdblischak/repdoc")
 ## Give it a try
 
 To try out repdoc, specify `repdoc_html` as the output format in the YAML header
-of one of your existing R Markdown files and then render it. For best results,
-the R Markdown file should be versioned in a Git repository:
+of one of your existing R Markdown files and then render with
+`rmarkdown::render` or the RStudio Knit button. For best results, the R Markdown
+file should be versioned in a Git repository:
 
 ```
 output: repdoc::repdoc_html
@@ -49,7 +50,8 @@ output: repdoc::repdoc_html
 ## Example 1: A single R Markdown file
 
 The analysis in `ex1-single-file` demonstrates how repdoc can add
-reproducibility features to a single R Markdown analysis.
+reproducibility features to a single R Markdown analysis. Use
+`rmarkdown::render` or the RStudio Knit button to render the file.
 
 ## Example 2: An R Markdown website
 
@@ -57,7 +59,8 @@ The analysis in `ex2-website` demonstrates how repdoc can add reproducibility
 features to an entire R Markdown website by specifying `repdoc::repdoc_html` as
 the output format in the shared `_site.yml` file. This also requires specifying
 the custom site generator `repdoc::repdoc_site` in the YAML header of the
-`index.Rmd` file.
+`index.Rmd` file. Since it is a website, use `rmarkdown::render_site` or the
+RStudio Knit button to render the file.
 
 ```
 site: repdoc::repdoc_site
@@ -69,7 +72,8 @@ The analysis in `ex3-website-subir` demonstrates how repdoc can additionally be
 used to set `knit_root_dir` across the R Markdown files. This facilitates
 organizing the R Markdown files into a subdirectory but still executing them
 from the root of the project. Furthermore, it uses `_repdoc.yml` to share repdoc
-options across the R Markdown files.
+options across the R Markdown files. Since it is a website, use
+`rmarkdown::render_site` or the RStudio Knit button to render the file.
 
 ## Design
 
@@ -79,7 +83,9 @@ Markdown document.
 
 ### Custom output format
 
-The custom output format `repdoc_html` extends `rmarkdown::html_document`.
+The custom output format `repdoc_html` extends `rmarkdown::html_document`. Thus
+any arguments for `rmarkdown::html_document`, e.g. `toc = TRUE` to add a table
+of contents, can be passed directly to `repdoc::repdoc_html`.
 
 It sets knitr options, including modifying the path to save figures, by setting
 the `knitr` argument of `output_format`.
@@ -104,7 +110,7 @@ argument `knit_root_dir` used by `render`.
 ### Custom site generator
 
 `repdoc_site` is a custom site generator for use with `repdoc_html` to create R
-Markdown websites.
+Markdown websites using `rmarkdown::render_site`.
 
 It knows that the figures file are written to `figure/<basename of Rmd file>`,
 so it moves these if there is an `output_dir` set in `_site.yml`.
