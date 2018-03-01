@@ -162,6 +162,28 @@ repdoc_html <- function(...) {
                                "/blob/", blobs$commit, "/", blobs$path, "/",
                                blobs$name, ")")
       }
+      # HTML
+      html <- to_html(input, outdir = output_dir)
+      blobs_html <- blobs[blobs$fname == html,
+                         c("commit", "author", "when")]
+      if (nrow(blobs_html) > 0) {
+        # Add HTML preview from https://htmlpreview.github.io/
+        if (!is.na(repdoc_opts$github)) {
+          blobs_html$commit <- stringr::str_replace(blobs_html$commit,
+                                                    "https://github.com",
+                                                    "https://htmlpreview.github.io/?https://github.com")
+        }
+        blobs_html_table <- knitr::kable(blobs_html, format = "html", padding = 10,
+                                         row.names = FALSE)
+        blobs_html_report <- c("<details>",
+                              "<summary>Click here to see past versions of the HTML file:</summary>",
+                              "<br>",
+                              blobs_html_table,
+                              "<br>",
+                              "</details>")
+        report <- c(report, blobs_html_report)
+      }
+      # R Markdown
       blobs_rmd <- blobs[blobs$fname == normalizePath(input),
                          c("commit", "author", "when")]
       if (nrow(blobs_rmd) > 0) {
@@ -174,21 +196,6 @@ repdoc_html <- function(...) {
                               "<br>",
                               "</details>")
         report <- c(report, blobs_rmd_report)
-      }
-
-      html <- to_html(input, outdir = output_dir)
-      blobs_html <- blobs[blobs$fname == html,
-                         c("commit", "author", "when")]
-      if (nrow(blobs_html) > 0) {
-        blobs_html_table <- knitr::kable(blobs_html, format = "html", padding = 10,
-                                        row.names = FALSE)
-        blobs_html_report <- c("<details>",
-                              "<summary>Click here to see past versions of the HTML file:</summary>",
-                              "<br>",
-                              blobs_html_table,
-                              "<br>",
-                              "</details>")
-        report <- c(report, blobs_html_report)
       }
     }
 
