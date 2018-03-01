@@ -16,9 +16,11 @@ get_github_from_remote <- function(path) {
   if (!stringr::str_detect(origin, "github")) {
     return(NA_character_)
   }
-  github <- stringr::str_extract(origin, "[:alnum:]+/[:alnum:]+\\.git$")
+  github <- origin
+  # Remove trailing .git
   github <- stringr::str_replace(github, "\\.git$", "")
-  github <- paste0("https://github.com/", github)
+  # If SSH, replace with HTTPS URL
+  github <- stringr::str_replace(github, "^git@github.com:", "https://github.com/")
   return(github)
 }
 
