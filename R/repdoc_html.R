@@ -104,6 +104,9 @@ repdoc_html <- function(...) {
     header_end <- header_delims[2]
     insert_point <- header_end
 
+    # Get output directory if it exists
+    output_dir <- get_output_dir(directory = dirname(input))
+
     # Start reproducibility report
     report <- c("**Reproducibility report:**",
                 sprintf("Results last updated on %s", Sys.Date()))
@@ -149,7 +152,7 @@ repdoc_html <- function(...) {
     }
     report <- c(report, rmd_status)
 
-    # Add past versions of R Markdown file
+    # Add past versions of R Markdown file and HTML file
     if (git2r::in_repository()) {
       blobs <- git2r::odb_blobs(r)
       blobs$fname <- file.path(git2r::workdir(r), blobs$path, blobs$name)
@@ -171,6 +174,21 @@ repdoc_html <- function(...) {
                               "<br>",
                               "</details>")
         report <- c(report, blobs_rmd_report)
+      }
+
+      html <- to_html(input, outdir = output_dir)
+      blobs_html <- blobs[blobs$fname == html,
+                         c("commit", "author", "when")]
+      if (nrow(blobs_html) > 0) {
+        blobs_html_table <- knitr::kable(blobs_html, format = "html", padding = 10,
+                                        row.names = FALSE)
+        blobs_html_report <- c("<details>",
+                              "<summary>Click here to see past versions of the HTML file:</summary>",
+                              "<br>",
+                              blobs_html_table,
+                              "<br>",
+                              "</details>")
+        report <- c(report, blobs_html_report)
       }
     }
 

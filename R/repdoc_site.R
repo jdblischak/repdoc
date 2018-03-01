@@ -46,15 +46,7 @@ repdoc_site <- function(input, encoding = getOption("encoding"), ...) {
     }
 
     # Get output directory if it exists
-    site_fname <- file.path(input, "_site.yml")
-    site_yml <- yaml::yaml.load_file(site_fname)
-    if (is.null(site_yml$output_dir)) {
-      output_dir <- input
-    } else {
-      output_dir <- file.path(input, site_yml$output_dir)
-      dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
-      output_dir <- normalizePath(output_dir)
-    }
+    output_dir <- get_output_dir(directory = input)
 
     # For an R Markdown website, the output_options self_contained and lib_dir
     # must be set. Force them here instead of temporarily editing the _site.yml
