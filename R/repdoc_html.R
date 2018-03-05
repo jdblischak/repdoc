@@ -211,6 +211,23 @@ repdoc_html <- function(...) {
       report <- c(report, s_report)
     }
 
+    # Check the global environment for objects
+    ls_globalenv <- ls(name = .GlobalEnv)
+    if (length(ls_globalenv) == 0) {
+      ls_globalenv_report <- paste(clisymbols::symbol$tick,
+                                   "**SUCCESS:** These results were generated in a clean R environment")
+    } else {
+      ls_globalenv_report <- paste(clisymbols::symbol$cross,
+                                   "**WARNING:** These results were **not** generated in a clean R environment",
+                                   "<details>",
+                                   "<summary>Click here to see the objects defined in the global environment:</summary>",
+                                   "<br>",
+                                   paste(ls_globalenv, collapse = " "),
+                                   "<br>",
+                                   "</details>")
+    }
+    report <- c(report, ls_globalenv_report)
+
     # Set seed at beginning
     seed_chunk <- c("",
                     "```{r seed-set-by-repdoc, echo = FALSE}",
