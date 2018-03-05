@@ -199,6 +199,18 @@ repdoc_html <- function(...) {
       }
     }
 
+    # Add Git status
+    if (git2r::in_repository()) {
+      s <- git2r::status(r)
+      s_report <- c("<details>",
+                    "<summary>Click here to see the status of the Git repository:</summary>",
+                    "<br>",
+                    utils::capture.output(print(s)),
+                    "<br>",
+                    "</details>")
+      report <- c(report, s_report)
+    }
+
     # Set seed at beginning
     seed_chunk <- c("",
                     "```{r seed-set-by-repdoc, echo = FALSE}",

@@ -20,5 +20,6 @@ Imports:
     knitr,
     rprojroot,
     stringr,
+    utils,
     yaml
 RoxygenNote: 6.0.1
