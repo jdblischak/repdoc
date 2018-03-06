@@ -7,10 +7,13 @@ control, it implements multiple features to facilitate reproducibility:
 * Inserts the date the HTML file was last updated
 * Inserts the version of the Git repository when the HTML file was built
 * Warns if the R Markdown file had unsaved changes when the HTML file was built
+* Reports past versions of the HTML file
 * Reports past versions of the R Markdown file
 * Sets a seed for random number generation
 * Inserts the session information at the end of the HTML file
 * Organizes the output figure files by the R Markdown file that generated them
+* Reports the status of the Git repository
+* Reports if there were variables defined in the global environment
 
 This package is for testing features before integrating them into
 [workflowr](https://github.com/jdblischak/workflowr).
