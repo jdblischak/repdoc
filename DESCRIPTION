@@ -21,5 +21,6 @@ Imports:
     rprojroot,
     stringr,
     utils,
+    whisker,
     yaml
 RoxygenNote: 6.0.1
