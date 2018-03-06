@@ -18,6 +18,10 @@ control, it implements multiple features to facilitate reproducibility:
 This package is for testing features before integrating them into
 [workflowr](https://github.com/jdblischak/workflowr).
 
+Example screenshot of reproducibility report added to beginning of R Markdown file:
+
+![](screenshot.png)
+
 ## Installation
 
 You can install repdoc from GitHub with:
