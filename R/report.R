@@ -144,7 +144,8 @@ ensure that the code is always run in an empty environment.
 
 create_objects_table <- function(env) {
   objects <- ls(name = env)
-  classes <- vapply(env, class, character(1))
+  classes <- vapply(env, function(x) paste(class(x), collapse = ";"),
+                    character(1))
   sizes <- vapply(env, function(x) format(object.size(x), units = "auto"),
                   character(1))
   df <- data.frame(Name = objects, Class = classes, Size = sizes)
@@ -179,7 +180,6 @@ format_check <- function(check) {
   text <- whisker::whisker.render(template, data)
   return(text)
 }
-
 
 check_rmd <- function(input, r, s) {
 
