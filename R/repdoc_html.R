@@ -169,9 +169,13 @@ repdoc_html <- function(...) {
   pre_processor <- function(metadata, input_file, runtime, knit_meta,
                             files_dir, output_dir) {
     fname_footer <- tempfile("footer", fileext = ".html")
+    repdoc_version <- packageVersion("repdoc")
     footer <- c("<hr>",
                 "<p>",
-                "This reproducible <a href=\"http://rmarkdown.rstudio.com\">R Markdown</a> analysis was created with <a href=\"https://github.com/jdblischak/repdoc\">repdoc</a>",
+                "This reproducible <a href=\"http://rmarkdown.rstudio.com\">R
+                Markdown</a> analysis was created with <a
+                href=\"https://github.com/jdblischak/repdoc\">repdoc</a> ",
+                as.character(repdoc_version),
                 "</p>",
                 "<hr>")
     writeLines(footer, con = fname_footer)
