@@ -45,7 +45,7 @@ check_environment <- function() {
   ls_globalenv <- ls(name = .GlobalEnv)
   if (length(ls_globalenv) == 0) {
     pass <- TRUE
-    summary <- "<strong>Environment:</strong> Empty"
+    summary <- "<strong>Environment:</strong> empty"
     details <-
 "
 Great job! The global environment was empty. Objects defined in the global
@@ -54,7 +54,7 @@ For reproduciblity it's best to always run the code in an empty environment.
 "
   } else {
     pass <- FALSE
-    summary <- "<strong>Environment:</strong> Objects present"
+    summary <- "<strong>Environment:</strong> objects present"
     details <-
 "
 The global environment had objects present when the code in the R Markdown
@@ -63,9 +63,29 @@ unknown ways. For reproduciblity it's best to always run the code in an empty
 environment. Use <code>wflow_publish</code> or <code>wflow_build</code> to
 ensure that the code is always run in an empty environment.
 "
+    objects_table <- create_objects_table(.GlobalEnv)
+    details <- paste(collapse = "\n",
+                     details,
+                     "<br><br>",
+                     "<p>The following objects were defined in the global
+                     environment when these results were created:</p>",
+                     objects_table)
   }
 
   return(list(pass = pass, summary = summary, details = details))
+}
+
+create_objects_table <- function(env) {
+  objects <- ls(name = env)
+  classes <- vapply(env, class, character(1))
+  sizes <- vapply(env, function(x) format(object.size(x), units = "auto"),
+                  character(1))
+  df <- data.frame(Name = objects, Class = classes, Size = sizes)
+  table <- knitr::kable(df, format = "html", row.names = FALSE)
+  # Add table formatting
+  table <- stringr::str_replace(table, "<table>",
+            "<table style = \"border-collapse:separate; border-spacing:5px;\">")
+  return(as.character(table))
 }
 
 format_check <- function(check) {
@@ -114,30 +134,30 @@ check_rmd <- function(input, r, s) {
 
   if (rmd_status == "up-to-date") {
     pass <- TRUE
-    summary <- "The R Markdown file is up-to-date"
+    summary <- "<strong>R Markdown file:</strong> up-to-date"
     details <-
-      "
-      Great! Since the R Markdown file has been committed to the Git
-      repository, you know the exact version of the code that produced these
-      results.
-      "
+"
+Great! Since the R Markdown file has been committed to the Git repository, you
+know the exact version of the code that produced these results.
+"
   } else {
     pass <- FALSE
-    summary <- "The R Markdown file has uncommitted changes"
+    summary <- "<strong>R Markdown file:</strong> uncommitted changes"
     if (rmd_status %in% c("staged", "unstaged")) {
       details <- sprintf("The R Markdown file has %s changes.", rmd_status)
     } else {
       details <- sprintf("The R Markdown is %s by Git.", rmd_status)
     }
-    details <- paste(details,
-                     "
-                 To know which version of the R Markdown file created these
-                 results, you'll want to first commit it to the Git repo. If
-                 you're still working on the analysis, you can ignore this
-                 warning. When you're finished, you can run
-                 <code>wflow_publish</code> to commit the R Markdown file and
-                 build the HTML.
-                 ", collapse = " ")
+    details <- paste(collapse = " ", details,
+"
+To know which version of the R Markdown file created these
+results, you'll want to first commit it to the Git repo. If
+you're still working on the analysis, you can ignore this
+warning. When you're finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and
+build the HTML.
+"
+                    )
   }
 
   return(list(pass = pass, summary = summary, details = details))
