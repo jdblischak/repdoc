@@ -1,10 +1,8 @@
 
-create_report <- function(input, output_dir, opts) {
+create_report <- function(input, output_dir, has_code, opts) {
 
   input <- normalizePath(input)
   input_dir <- dirname(input)
-
-  has_code <- detect_code(input)
 
   uses_git <- git2r::in_repository(input_dir)
   if (uses_git) {
@@ -27,6 +25,9 @@ create_report <- function(input, output_dir, opts) {
 
     # Check seed
     checks$result_seed <- check_seed(opts$seed)
+
+    # Check sessioninfo
+    checks$result_sessioninfo <- check_sessioninfo(input, opts$sessioninfo)
   }
 
   # Version history ------------------------------------------------------------
@@ -45,6 +46,38 @@ create_report <- function(input, output_dir, opts) {
   report <- whisker::whisker.render(template, data)
 
   return(report)
+}
+
+check_sessioninfo <- function(input, sessioninfo) {
+  # Check if the user manually inserted sessionInfo or session_info (from
+  # devtools or sessioninfo packages)
+  lines <- readLines(input)
+  any_sessioninfo <- stringr::str_detect(lines, "session(_i|I)nfo")
+  if (any(any_sessioninfo) || sessioninfo != "") {
+    pass <- TRUE
+    summary <- "<strong>Session information:</strong> recorded"
+    details <-
+"
+Great job! Recording the operating system, R version, and package versions is
+critical for reproducibility.
+"
+  } else {
+    pass <- FALSE
+    summary <- "<strong>Session information:</strong> unavailable"
+    details <-
+"
+Recording the operating system, R version, and package versions is critical
+for reproducibility. To record the session information, add <code>sessioninfo:
+\"sessionInfo()\"</code> to _repdoc.yml. Alternatively, you could use
+<code>devtools::session_info()</code> or
+<code>sessioninfo::session_info()</code>. Lastly, you can manually add a code
+chunk to this file to run any one of these commands and then disable to
+automatic insertion by changing the repdoc setting to <code>sessioninfo:
+\"\"</code>.
+"
+  }
+
+  return(list(pass = pass, summary = summary, details = details))
 }
 
 check_seed <- function(seed) {

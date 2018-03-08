@@ -107,10 +107,12 @@ repdoc_html <- function(...) {
     # Get output directory if it exists
     output_dir <- get_output_dir(directory = dirname(input))
 
-    report <- create_report(input, output_dir, repdoc_opts)
+    has_code <- detect_code(input)
+
+    report <- create_report(input, output_dir, has_code, repdoc_opts)
 
     # Set seed at beginning
-    if (is.numeric(repdoc_opts$seed) && length(repdoc_opts$seed) == 1) {
+    if (has_code && is.numeric(repdoc_opts$seed) && length(repdoc_opts$seed) == 1) {
       seed_chunk <- c("",
                       "```{r seed-set-by-repdoc, echo = FALSE}",
                       sprintf("set.seed(%d)", repdoc_opts$seed),
@@ -120,15 +122,18 @@ repdoc_html <- function(...) {
       seed_chunk <- ""
     }
 
-
     # Add session information at the end
-    sessioninfo <- c("",
-                     "## Session information",
-                     "",
-                     "```{r session-info-chunk-inserted-by-repdoc}",
-                     repdoc_opts$sessioninfo,
-                     "```",
-                     "")
+    if (has_code && repdoc_opts$sessioninfo != "") {
+      sessioninfo <- c("",
+                       "## Session information",
+                       "",
+                       "```{r session-info-chunk-inserted-by-repdoc}",
+                       repdoc_opts$sessioninfo,
+                       "```",
+                       "")
+    } else {
+      sessioninfo <- ""
+    }
 
     lines_out <- c(lines_in[1:header_end],
                    report,
