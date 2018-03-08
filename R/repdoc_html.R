@@ -110,11 +110,16 @@ repdoc_html <- function(...) {
     report <- create_report(input, output_dir, repdoc_opts)
 
     # Set seed at beginning
-    seed_chunk <- c("",
-                    "```{r seed-set-by-repdoc, echo = FALSE}",
-                    sprintf("set.seed(%d)", repdoc_opts$seed),
-                    "```",
-                    "")
+    if (is.numeric(repdoc_opts$seed) && length(repdoc_opts$seed) == 1) {
+      seed_chunk <- c("",
+                      "```{r seed-set-by-repdoc, echo = FALSE}",
+                      sprintf("set.seed(%d)", repdoc_opts$seed),
+                      "```",
+                      "")
+    } else {
+      seed_chunk <- ""
+    }
+
 
     # Add session information at the end
     sessioninfo <- c("",

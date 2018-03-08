@@ -20,8 +20,14 @@ create_report <- function(input, output_dir, opts) {
     checks$result_rmd <- check_rmd(input, r, s)
   }
 
-  # Check environment
-  checks$result_environment <- check_environment()
+
+  if (has_code) {
+    # Check environment
+    checks$result_environment <- check_environment()
+
+    # Check seed
+    checks$result_seed <- check_seed(opts$seed)
+  }
 
   # Version history ------------------------------------------------------------
 
@@ -39,6 +45,34 @@ create_report <- function(input, output_dir, opts) {
   report <- whisker::whisker.render(template, data)
 
   return(report)
+}
+
+check_seed <- function(seed) {
+  if (is.numeric(seed) && length(seed) == 1) {
+    pass <- TRUE
+    seed_code <- sprintf("<code>set.seed(%d)</code>", seed)
+    summary <- sprintf("<strong>Seed:</strong> %s", seed_code)
+    details <- sprintf(
+"
+The command %s was run prior to running the code in the R Markdown file.
+Setting a seed ensures that any results that rely on randomness, e.g.
+subsampling or permutations, are reproducible.
+"
+                       , seed_code)
+  } else {
+    pass <- FALSE
+    summary <- "<strong>Seed:</strong> none"
+    details <-
+"
+No seed was set with <code>set.seed</code> prior to running the code in the R
+Markdown file. Setting a seed ensures that any results that rely on
+randomness, e.g. subsampling or permutations, are reproducible. To set a seed,
+specify an integer value for the option seed in _repdoc.yml or the YAML header
+of the R Markdown file.
+"
+  }
+
+  return(list(pass = pass, summary = summary, details = details))
 }
 
 check_environment <- function() {
