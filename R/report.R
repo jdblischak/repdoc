@@ -8,6 +8,9 @@ create_report <- function(input, output_dir, has_code, opts) {
   if (uses_git) {
     r <- git2r::repository(input_dir, discover = TRUE)
     s <- git2r::status(r)
+  } else {
+    r <- NULL
+    s <- NULL
   }
 
   #repdoc checks ---------------------------------------------------------------
@@ -17,7 +20,6 @@ create_report <- function(input, output_dir, has_code, opts) {
   if (uses_git) {
     checks$result_rmd <- check_rmd(input, r, s)
   }
-
 
   if (has_code) {
     # Check environment
@@ -30,7 +32,8 @@ create_report <- function(input, output_dir, has_code, opts) {
     checks$result_sessioninfo <- check_sessioninfo(input, opts$sessioninfo)
   }
 
-  # Version history ------------------------------------------------------------
+  # Check version control
+  checks$result_vc <- check_vc(input, output_dir, r, s, opts$github)
 
   # Formatting -----------------------------------------------------------------
 
@@ -46,6 +49,51 @@ create_report <- function(input, output_dir, has_code, opts) {
   report <- whisker::whisker.render(template, data)
 
   return(report)
+}
+
+check_vc <- function(input, output_dir, r, s, github) {
+ if (!is.null(r)) {
+   pass <- TRUE
+   log <- git2r::commits(r)
+   sha <- log[[1]]@sha
+   sha7 <- shorten_sha(sha)
+   if (!is.na(github)) {
+     sha_display <- sprintf("<a href=\"%s/tree/%s\" target=\"_blank\">%s</a>",
+                            github, sha, sha7)
+   } else {
+     sha_display <- sha7
+   }
+   summary <- sprintf("<strong>Repository version:</strong> %s", sha_display)
+   status <- utils::capture.output(print(s))
+   status <- c("<pre><code>", status, "</code></pre>")
+   status <- paste(status, collapse = "\n")
+   details <- paste(collpase = "\n",
+"
+Great! You are using Git for version control. Tracking code development and
+connecting the code version to the results is critical for reproducibility.
+The version displayed above was the version of the Git repository at the time
+these results were generated.
+<br><br>
+Note that you need to be careful to ensure that all relevant files for the
+analysis have been committed to Git prior to generating the results (you can
+use <code>wflow_publish</code> or <code>wflow_commit</code>). repdoc only
+checks the R Markdown file, but you know if there are other scripts or data
+files that it depends on. Below is the status of the Git repository when the
+results were generated:
+"
+                , status)
+ } else {
+   pass <- FALSE
+   summary <- "<strong>Repository version:</strong> no version control"
+   details <-
+"
+Tracking code development and connecting the code version to the results is
+critical for reproducibility. To start using Git, open the Terminal and type
+<code>git init</code> in your project directory.
+"
+ }
+
+  return(list(pass = pass, summary = summary, details = details))
 }
 
 check_sessioninfo <- function(input, sessioninfo) {
