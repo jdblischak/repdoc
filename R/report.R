@@ -144,9 +144,9 @@ ensure that the code is always run in an empty environment.
 
 create_objects_table <- function(env) {
   objects <- ls(name = env)
-  classes <- vapply(env, function(x) paste(class(x), collapse = ";"),
+  classes <- vapply(objects, function(x) paste(class(env[[x]]), collapse = ";"),
                     character(1))
-  sizes <- vapply(env, function(x) format(object.size(x), units = "auto"),
+  sizes <- vapply(objects, function(x) format(object.size(env[[x]]), units = "auto"),
                   character(1))
   df <- data.frame(Name = objects, Class = classes, Size = sizes)
   table <- knitr::kable(df, format = "html", row.names = FALSE)
