@@ -1,4 +1,167 @@
 
+create_report <- function(input, output_dir, opts) {
+
+  input <- normalizePath(input)
+  input_dir <- dirname(input)
+
+  has_code <- detect_code(input)
+
+  uses_git <- git2r::in_repository(input_dir)
+  if (uses_git) {
+    r <- git2r::repository(input_dir, discover = TRUE)
+    s <- git2r::status(r)
+  }
+
+  #repdoc checks ---------------------------------------------------------------
+  checks <- list()
+
+  # Check R Markdown status
+  if (uses_git) {
+    checks$result_rmd <- check_rmd(input, r, s)
+  }
+
+  # Check environment
+  checks$result_environment <- check_environment()
+
+  # Version history ------------------------------------------------------------
+
+  # Formatting -----------------------------------------------------------------
+
+  checks_formatted <- Map(format_check, checks)
+  template <-
+"
+<strong>repdoc checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+{{{checks}}}
+</ul>
+"
+  data <- list(checks = paste(unlist(checks_formatted), collapse = "\n"))
+  report <- whisker::whisker.render(template, data)
+
+  return(report)
+}
+
+check_environment <- function() {
+  ls_globalenv <- ls(name = .GlobalEnv)
+  if (length(ls_globalenv) == 0) {
+    pass <- TRUE
+    summary <- "<strong>Environment:</strong> Empty"
+    details <-
+"
+Great job! The global environment was empty. Objects defined in the global
+environment can affect the analysis in your R Markdown file in unknown ways.
+For reproduciblity it's best to always run the code in an empty environment.
+"
+  } else {
+    pass <- FALSE
+    summary <- "<strong>Environment:</strong> Objects present"
+    details <-
+"
+The global environment had objects present when the code in the R Markdown
+file was run. These objects can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it's best to always run the code in an empty
+environment. Use <code>wflow_publish</code> or <code>wflow_build</code> to
+ensure that the code is always run in an empty environment.
+"
+  }
+
+  return(list(pass = pass, summary = summary, details = details))
+}
+
+format_check <- function(check) {
+  if (check$pass) {
+    symbol <- sprintf("<strong style=\"color:blue;\">%s</strong>",
+                      clisymbols::symbol$tick)
+  } else {
+    symbol <- sprintf("<strong style=\"color:red;\">%s</strong>",
+                      clisymbols::symbol$cross)
+  }
+  template <-
+    "
+  <li>
+  <details>
+  <summary>
+  {{{symbol}}} {{{summary}}}
+  </summary>
+  {{{details}}}
+  </details>
+  </li>
+  "
+  data <- list(symbol = symbol, summary = check$summary,
+               details = check$details)
+  text <- whisker::whisker.render(template, data)
+  return(text)
+}
+
+
+check_rmd <- function(input, r, s) {
+
+  s_simpler <- lapply(s, unlist)
+  s_simpler <- lapply(s_simpler, add_git_path, r = r)
+
+  # Determine current status of R Markdown file
+  if (input %in% s_simpler$staged) {
+    rmd_status <- "staged"
+  } else if (input %in% s_simpler$unstaged) {
+    rmd_status <- "unstaged"
+  } else if (input %in% s_simpler$untracked) {
+    rmd_status <- "untracked"
+  } else if (input %in% s_simpler$ignored) {
+    rmd_status <- "ignored"
+  } else {
+    rmd_status <- "up-to-date"
+  }
+
+  if (rmd_status == "up-to-date") {
+    pass <- TRUE
+    summary <- "The R Markdown file is up-to-date"
+    details <-
+      "
+      Great! Since the R Markdown file has been committed to the Git
+      repository, you know the exact version of the code that produced these
+      results.
+      "
+  } else {
+    pass <- FALSE
+    summary <- "The R Markdown file has uncommitted changes"
+    if (rmd_status %in% c("staged", "unstaged")) {
+      details <- sprintf("The R Markdown file has %s changes.", rmd_status)
+    } else {
+      details <- sprintf("The R Markdown is %s by Git.", rmd_status)
+    }
+    details <- paste(details,
+                     "
+                 To know which version of the R Markdown file created these
+                 results, you'll want to first commit it to the Git repo. If
+                 you're still working on the analysis, you can ignore this
+                 warning. When you're finished, you can run
+                 <code>wflow_publish</code> to commit the R Markdown file and
+                 build the HTML.
+                 ", collapse = " ")
+  }
+
+  return(list(pass = pass, summary = summary, details = details))
+}
+
+add_git_path <- function(x, r) {
+  if (!is.null(x)) {
+    paste0(git2r::workdir(r), x)
+  } else {
+   NA_character_
+  }
+}
+
+detect_code <- function(input) {
+  stopifnot(file.exists(input))
+  lines <- readLines(input)
+  code_chunks <- stringr::str_detect(lines, "^```\\{r")
+  # Inline code can span multiple lines, so concatenate first. Only interprets
+  # as code if at least two characters after the r. A new line counts as a
+  # character, which is the same as the space inserted by the collapse.
+  code_inline <- stringr::str_detect(paste(lines, collapse = " "),
+                                     "`r.{2,}`")
+  return(any(code_chunks) || code_inline)
+}
 
 generate_report <- function(input, output_dir = NULL, sessioninfo = "") {
 

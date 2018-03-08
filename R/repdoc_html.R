@@ -107,22 +107,7 @@ repdoc_html <- function(...) {
     # Get output directory if it exists
     output_dir <- get_output_dir(directory = dirname(input))
 
-    report_stats <- generate_report(input,
-                                    output_dir = repdoc_opts$knit_root_dir,
-                                    sessioninfo = repdoc_opts$sessioninfo)
-
-    report <- format_report(date = report_stats$date,
-                            sha = report_stats$sha,
-                            status = report_stats$status,
-                            rmd_status = report_stats$rmd_status,
-                            blobs_html = report_stats$blobs_html,
-                            git_html = report_stats$git_html,
-                            blobs_rmd = report_stats$blobs_rmd,
-                            git_rmd = report_stats$git_rmd,
-                            ls_globalenv = report_stats$ls_globalenv,
-                            seed = repdoc_opts$seed,
-                            github = repdoc_opts$github,
-                            sessioninfo = report_stats$sessioninfo)
+    report <- create_report(input, output_dir, repdoc_opts)
 
     # Set seed at beginning
     seed_chunk <- c("",
