@@ -136,6 +136,7 @@ repdoc_html <- function(...) {
     }
 
     lines_out <- c(lines_in[1:header_end],
+                   "**Last updated:** `r Sys.Date()`",
                    report,
                    "---",
                    seed_chunk,
