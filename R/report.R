@@ -97,6 +97,10 @@ get_versions <- function(input, output_dir, blobs, r, github) {
   colnames(blobs_file) <- c("File", "Version", "Author", "Date")
   blobs_file <- blobs_file[order(blobs_file$Date, decreasing = TRUE), ]
   blobs_file$Date <- as.Date(blobs_file$Date)
+  blobs_file$Message <- vapply(blobs_file$Version,
+                               get_commit_title,
+                               "character(1)",
+                               r = r)
   git_html <- stringr::str_replace(html, git2r::workdir(r), "")
   git_rmd <- stringr::str_replace(input, git2r::workdir(r), "")
 
@@ -124,6 +128,7 @@ get_versions <- function(input, output_dir, blobs, r, github) {
 <th style=\"text-align:left;\"> Version </th>
 <th style=\"text-align:left;\"> Author </th>
 <th style=\"text-align:left;\"> Date </th>
+<th style=\"text-align:left;\"> Message </th>
 </tr>
 </thead>
 <tbody>
@@ -133,6 +138,7 @@ get_versions <- function(input, output_dir, blobs, r, github) {
 <td style=\"text-align:left;\"> {{{Version}}} </td>
 <td style=\"text-align:left;\"> {{Author}} </td>
 <td style=\"text-align:left;\"> {{Date}} </td>
+<td style=\"text-align:left;\"> {{Message}} </td>
 </tr>
 {{/blobs_file}}
 </tbody>
@@ -143,6 +149,12 @@ get_versions <- function(input, output_dir, blobs, r, github) {
   text <- whisker::whisker.render(template, data)
 
   return(text)
+}
+
+get_commit_title <- function(x, r) {
+  full <- git2r::lookup(r, x)@message
+  title <- stringr::str_split(full, "\n")[[1]][1]
+  return(title)
 }
 
 check_vc <- function(input, output_dir, r, s, github) {
