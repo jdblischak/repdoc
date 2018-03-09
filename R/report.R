@@ -13,7 +13,7 @@ create_report <- function(input, output_dir, has_code, opts) {
     s <- NULL
   }
 
-  #repdoc checks ---------------------------------------------------------------
+  # repdoc checks --------------------------------------------------------------
   checks <- list()
 
   # Check R Markdown status
@@ -35,20 +35,114 @@ create_report <- function(input, output_dir, has_code, opts) {
   # Check version control
   checks$result_vc <- check_vc(input, output_dir, r, s, opts$github)
 
-  # Formatting -----------------------------------------------------------------
+  # Formatting checks ----------------------------------------------------------
 
   checks_formatted <- Map(format_check, checks)
-  template <-
+  template_checks <-
 "
 <strong>repdoc checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 {{{checks}}}
 </ul>
 "
-  data <- list(checks = paste(unlist(checks_formatted), collapse = "\n"))
-  report <- whisker::whisker.render(template, data)
+  data_checks <- list(checks = paste(unlist(checks_formatted), collapse = "\n"))
+  report_checks <- whisker::whisker.render(template_checks, data_checks)
+
+  # Version history ------------------------------------------------------------
+
+  if (uses_git) {
+    blobs <- git2r::odb_blobs(r)
+    versions <- get_versions(input, output_dir, blobs, r, opts$github)
+    if (versions == "") {
+      report_versions <- versions
+    } else {
+      template_versions <-
+"
+<details>
+<summary>
+<small><strong>Expand here to see past versions:</strong></small>
+</summary>
+<ul>
+{{{versions}}}
+</ul>
+</details>
+"
+      report_versions <- whisker::whisker.render(template_versions,
+                                                 data = list(versions = versions))
+    }
+  } else {
+    report_versions <- ""
+  }
+
+  # Return ---------------------------------------------------------------------
+
+  report <- paste(report_checks, report_versions, collapse = "\n")
 
   return(report)
+}
+
+get_versions <- function(input, output_dir, blobs, r, github) {
+
+  blobs$fname <- file.path(git2r::workdir(r), blobs$path, blobs$name)
+  blobs$fname <- fs::path_abs(blobs$fname)
+  blobs$ext <- tools::file_ext(blobs$fname)
+
+  html <- to_html(input, outdir = output_dir)
+  blobs_file <- blobs[blobs$fname %in% c(input, html),
+                      c("ext", "commit", "author", "when")]
+  # Exit early if there are no past versions
+  if (nrow(blobs_file) == 0) {
+    return("")
+  }
+  colnames(blobs_file) <- c("File", "Version", "Author", "Date")
+  blobs_file <- blobs_file[order(blobs_file$Date, decreasing = TRUE), ]
+  blobs_file$Date <- as.Date(blobs_file$Date)
+  git_html <- stringr::str_replace(html, git2r::workdir(r), "")
+  git_rmd <- stringr::str_replace(input, git2r::workdir(r), "")
+
+  if (is.na(github)) {
+    blobs_file$Version <- shorten_sha(blobs_file$Version)
+  } else {
+    html_preview <- "https://htmlpreview.github.io/?"
+    blobs_file$Version <- ifelse(blobs_file$File == "html",
+                                 # HTML preview URL
+                                 sprintf("<a href=\"%s%s/blob/%s/%s\" target=\"_blank\">%s</a>",
+                                         html_preview, github, blobs_file$Version,
+                                         git_html, shorten_sha(blobs_file$Version)),
+                                 # R Markdown GitHub URL
+                                 sprintf("<a href=\"%s/blob/%s/%s\" target=\"_blank\">%s</a>",
+                                         github, blobs_file$Version, git_rmd,
+                                         shorten_sha(blobs_file$Version)))
+  }
+
+  template <-
+"
+<table style = \"border-collapse:separate; border-spacing:5px;\">
+<thead>
+<tr>
+<th style=\"text-align:left;\"> File </th>
+<th style=\"text-align:left;\"> Version </th>
+<th style=\"text-align:left;\"> Author </th>
+<th style=\"text-align:left;\"> Date </th>
+</tr>
+</thead>
+<tbody>
+{{#blobs_file}}
+<tr>
+<td style=\"text-align:left;\"> {{{File}}} </td>
+<td style=\"text-align:left;\"> {{{Version}}} </td>
+<td style=\"text-align:left;\"> {{Author}} </td>
+<td style=\"text-align:left;\"> {{Date}} </td>
+</tr>
+{{/blobs_file}}
+</tbody>
+</table>
+</details>
+  "
+  data <- list(blobs_file = unname(whisker::rowSplit(blobs_file)))
+  text <- whisker::whisker.render(template, data)
+
+  return(text)
 }
 
 check_vc <- function(input, output_dir, r, s, github) {
