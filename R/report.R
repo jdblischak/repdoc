@@ -150,6 +150,68 @@ get_versions <- function(input, output_dir, blobs, r, github) {
   return(text)
 }
 
+# Get versions table for figures. Needs to be refactored to share code with
+# get_versions.
+get_versions_fig <- function(fig, r, github) {
+  fig <- normalizePath(fig)
+  blobs <- git2r::odb_blobs(r)
+  blobs$fname <- ifelse(blobs$path == "", blobs$name,
+                        file.path(blobs$path, blobs$name))
+  blobs$fname_abs <- paste0(git2r::workdir(r), blobs$fname)
+  blobs_file <- blobs[blobs$fname_abs == fig, ]
+
+  # Exit early if there are no past versions
+  if (nrow(blobs_file) == 0) {
+    return("")
+  }
+
+  if (is.na(github)) {
+    blobs_file$commit <- shorten_sha(blobs_file$commit)
+  } else {
+    blobs_file$commit <- sprintf("<a href=\"%s/blob/%s/%s\" target=\"_blank\">%s</a>",
+                                 github, blobs_file$commit,
+                                 blobs_file$fname,
+                                 shorten_sha(blobs_file$commit))
+  }
+
+  blobs_file <- blobs_file[, c("commit", "author", "when")]
+  colnames(blobs_file) <- c("Version", "Author", "Date")
+  blobs_file <- blobs_file[order(blobs_file$Date, decreasing = TRUE), ]
+  blobs_file$Date <- as.Date(blobs_file$Date)
+
+  template <-
+    "
+  <details>
+  <summary>Expand here to see past versions of {{fig}}:</summary>
+  <table style = \"border-collapse:separate; border-spacing:5px;\">
+  <thead>
+  <tr>
+  <th style=\"text-align:left;\"> Version </th>
+  <th style=\"text-align:left;\"> Author </th>
+  <th style=\"text-align:left;\"> Date </th>
+  </tr>
+  </thead>
+  <tbody>
+  {{#blobs_file}}
+  <tr>
+  <td style=\"text-align:left;\"> {{{Version}}} </td>
+  <td style=\"text-align:left;\"> {{Author}} </td>
+  <td style=\"text-align:left;\"> {{Date}} </td>
+  </tr>
+  {{/blobs_file}}
+  </tbody>
+  </table>
+  </details>
+  "
+  data <- list(fig = basename(fig),
+               blobs_file = unname(whisker::rowSplit(blobs_file)))
+  text <- whisker::whisker.render(template, data)
+
+  return(text)
+
+}
+
+
 get_commit_title <- function(x, r) {
   full <- git2r::lookup(r, x)@message
   title <- stringr::str_split(full, "\n")[[1]][1]

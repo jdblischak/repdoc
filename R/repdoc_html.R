@@ -23,17 +23,17 @@ repdoc_html <- function(...) {
   plot_hook <- function(x, options) {
     if (git2r::in_repository(".")) {
       r <- git2r::repository(".", discover = TRUE)
-      blobs <- git2r::odb_blobs(r)
-      blobs$fname <- file.path(git2r::workdir(r), blobs$path, blobs$name)
-      blobs$fname <- fs::path_abs(blobs$fname)
+
       input <- file.path(getwd(), paste0(options$fig.path, options$label,
                                          "-", options$fig.cur, ".png"))
-      blobs_file <- blobs[blobs$fname == input, ]
-      if (nrow(blobs_file) == 0) {
+      fig_versions <- get_versions_fig(fig = input, r = r,
+                                       github = get_github_from_remote(dirname(input)))
+
+      if (fig_versions == "") {
         return(sprintf("![](%s)", x))
       } else {
         paste(c(sprintf("![](%s)\n", x),
-                knitr::kable(blobs_file, format = "html", row.names = FALSE)),
+                fig_versions),
               collapse = "\n")
       }
     } else {
@@ -44,7 +44,7 @@ repdoc_html <- function(...) {
   knitr <- rmarkdown::knitr_options(opts_chunk = list(comment = NA,
                                                       fig.align = "center",
                                                       tidy = FALSE),
-                                    # knit_hooks = list(plot = plot_hook),
+                                    knit_hooks = list(plot = plot_hook),
                                     opts_hooks = list(fig.path = hook_fig_path))
 
   # pre_knit function ----------------------------------------------------------
