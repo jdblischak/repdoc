@@ -298,7 +298,7 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-03-08</p>
+<p><strong>Last updated:</strong> 2018-03-13</p>
 <strong>repdoc checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -322,17 +322,15 @@ div.tocify {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/jdblischak/repdoc/tree/a059d9f08375f04e4cd0509f978b022992ad150e" target="_blank">a059d9f</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/jdblischak/repdoc/tree/df0d98895f41342778585c194c238dfeb1bb0213" target="_blank">df0d988</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_commit</code>). repdoc only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Untracked files:
     Untracked:  ex3-website-subdir/analysis/site_libs/
 
 Unstaged changes:
-    Modified:   ex1-single-file/figure/single.Rmd/pressure-1.png
     Modified:   ex1-single-file/single.html
     Modified:   ex2-website/docs/about.html
-    Modified:   ex2-website/docs/figure/index.Rmd/pressure-1.png
     Modified:   ex2-website/docs/index.html
     Modified:   ex3-website-subdir/docs/about.html
 
@@ -363,6 +361,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://htmlpreview.github.io/?https://github.com/jdblischak/repdoc/blob/df0d98895f41342778585c194c238dfeb1bb0213/ex3-website-subdir/docs/index.html" target="_blank">df0d988</a>
+</td>
+<td style="text-align:left;">
+John Blischak
+</td>
+<td style="text-align:left;">
+2018-03-13
+</td>
+<td style="text-align:left;">
+Rebuild examples.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://htmlpreview.github.io/?https://github.com/jdblischak/repdoc/blob/002221c0b66d8334c549bebbccb32a29def9fc4d/ex3-website-subdir/docs/index.html" target="_blank">002221c</a>
+</td>
+<td style="text-align:left;">
+John Blischak
+</td>
+<td style="text-align:left;">
+2018-03-08
+</td>
+<td style="text-align:left;">
+Rebuild HTML with version 0.0.0.9001.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 html
@@ -467,7 +499,6 @@ Add example 3: an R Markdown website with Rmd files in subdirectory
 </tr>
 </tbody>
 </table>
-<p></details></p>
 </ul>
 <p></details></p>
 <hr />
@@ -492,7 +523,10 @@ Add example 3: an R Markdown website with Rmd files in subdirectory
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>
 <p>You can also embed plots, for example:</p>
-<p><img src="figure/index.Rmd/pressure-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="figure">
+<img src="figure/index.Rmd/pressure-1.png" />
+
+</div>
 <p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
 </div>
 <div id="session-information" class="section level2">
@@ -503,17 +537,17 @@ Add example 3: an R Markdown website with Rmd files in subdirectory
  version  R version 3.3.2 (2016-10-31)
  os       OS X Yosemite 10.10.5       
  system   x86_64, darwin13.4.0        
- ui       X11                         
+ ui       RStudio                     
  language (EN)                        
  collate  en_US.UTF-8                 
  tz       America/New_York            
- date     2018-03-08                  
+ date     2018-03-13                  
 
 ─ Packages ──────────────────────────────────────────────────────────────
  package     * version     date       source                         
  assertthat    0.2.0       2017-04-11 CRAN (R 3.3.2)                 
  backports     1.1.2       2017-12-13 cran (@1.1.2)                  
- callr         2.0.2.9001  2018-03-07 Github (r-pkgs/callr@3d39856)  
+ callr         2.0.2.9001  2018-03-11 Github (r-pkgs/callr@3d39856)  
  cli           1.0.0       2017-11-05 cran (@1.0.0)                  
  clisymbols    1.2.0       2017-05-21 CRAN (R 3.3.2)                 
  crayon        1.3.4       2017-09-16 cran (@1.3.4)                  
@@ -532,17 +566,17 @@ Add example 3: an R Markdown website with Rmd files in subdirectory
  pkgload       1.0.0       2018-03-07 Github (r-lib/pkgload@0cd9f8d) 
  R6            2.2.2       2017-06-17 cran (@2.2.2)                  
  Rcpp          0.12.14     2017-11-23 cran (@0.12.14)                
- repdoc        0.0.0.9001  2018-03-09 local                          
+ repdoc      * 0.0.0.9002  2018-03-14 local                          
  rlang         0.1.6       2017-12-21 cran (@0.1.6)                  
- rmarkdown     1.8.10      2018-02-27 local                          
+ rmarkdown   * 1.9         2018-03-01 CRAN (R 3.3.2)                 
  rprojroot     1.3-2       2018-01-03 cran (@1.3-2)                  
  sessioninfo   1.0.0       2017-06-21 cran (@1.0.0)                  
- stringi       1.1.5       2017-04-07 cran (@1.1.5)                  
+ stringi       1.1.6       2017-11-17 cran (@1.1.6)                  
  stringr       1.2.0       2017-02-18 cran (@1.2.0)                  
  testthat      2.0.0       2017-12-13 cran (@2.0.0)                  
  usethis       1.3.0.9000  2018-03-07 Github (r-pkgs/usethis@59b0837)
  whisker       0.3-2       2013-04-28 CRAN (R 3.3.0)                 
- withr         2.1.1.9000  2018-03-07 Github (r-lib/withr@5d05571)   
+ withr         2.1.1.9000  2018-03-11 Github (r-lib/withr@5d05571)   
  yaml          2.1.16      2017-12-12 cran (@2.1.16)                 </code></pre>
 </div>
 
@@ -551,7 +585,7 @@ Add example 3: an R Markdown website with Rmd files in subdirectory
 This reproducible <a href="http://rmarkdown.rstudio.com">R
                 Markdown</a> analysis was created with <a
                 href="https://github.com/jdblischak/repdoc">repdoc</a> 
-0.0.0.9001
+0.0.0.9002
 </p>
 <hr>
 
