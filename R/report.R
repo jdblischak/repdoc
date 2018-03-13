@@ -143,8 +143,7 @@ get_versions <- function(input, output_dir, blobs, r, github) {
 {{/blobs_file}}
 </tbody>
 </table>
-</details>
-  "
+"
   data <- list(blobs_file = unname(whisker::rowSplit(blobs_file)))
   text <- whisker::whisker.render(template, data)
 
