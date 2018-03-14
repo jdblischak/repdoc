@@ -90,6 +90,10 @@ get_versions <- function(input, output_dir, blobs, r, github) {
   html <- to_html(input, outdir = output_dir)
   blobs_file <- blobs[blobs$fname %in% c(input, html),
                       c("ext", "commit", "author", "when")]
+  # Ignore blobs that don't map to commits (caused by `git commit --amend`)
+  git_log <- git2r::commits(r)
+  git_log_sha <- vapply(git_log, function(x) x@sha, character(1))
+  blobs_file <- blobs_file[blobs_file$commit %in% git_log_sha, ]
   # Exit early if there are no past versions
   if (nrow(blobs_file) == 0) {
     return("")
@@ -159,6 +163,10 @@ get_versions_fig <- function(fig, r, github) {
                         file.path(blobs$path, blobs$name))
   blobs$fname_abs <- paste0(git2r::workdir(r), blobs$fname)
   blobs_file <- blobs[blobs$fname_abs == fig, ]
+  # Ignore blobs that don't map to commits (caused by `git commit --amend`)
+  git_log <- git2r::commits(r)
+  git_log_sha <- vapply(git_log, function(x) x@sha, character(1))
+  blobs_file <- blobs_file[blobs_file$commit %in% git_log_sha, ]
 
   # Exit early if there are no past versions
   if (nrow(blobs_file) == 0) {
