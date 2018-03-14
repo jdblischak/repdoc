@@ -77,10 +77,16 @@ s <- git2r::status(r)
 status_to_df <- function(s) {
   stopifnot(class(s) == "git_status")
   s_vec <- unlist(s)
-  categories <- stringr::str_split(names(s_vec), pattern = "\\.", n = 2,
-                                   simplify = TRUE)
-  d <- data.frame(categories, s_vec, stringsAsFactors = FALSE)
-  colnames(d) <- c("state1", "state2", "file")
+  if (length(s_vec) > 0) {
+    categories <- stringr::str_split(names(s_vec), pattern = "\\.", n = 2,
+                                     simplify = TRUE)
+    d <- data.frame(categories, s_vec, stringsAsFactors = FALSE)
+    colnames(d) <- c("state1", "state2", "file")
+  } else {
+    d <- data.frame(state1 = character(0), state2 = character(0),
+                    file = character(0))
+  }
+
   return(d)
 }
 
