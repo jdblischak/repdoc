@@ -233,15 +233,14 @@ check_vc <- function(input, output_dir, r, s, github) {
    summary <- sprintf("<strong>Repository version:</strong> %s", sha_display)
    # Scrub HTML and other generated content (e.g. site_libs). It's ok that these
    # have uncommitted changes.
-   if (!is.null(output_dir)) {
-     s <- status_to_df(s)
-     # Can't start with output directory
-     s <- s[!stringr::str_detect(paste0(git2r::workdir(r), s$file),
-                                 paste0("^", normalizePath(output_dir))), ]
-     # Can't include site_libs
-     s <- s[!stringr::str_detect(s$file, "site_libs"), ]
-     s <- df_to_status(s)
-   }
+   s <- status_to_df(s)
+   # HTML
+   s <- s[!stringr::str_detect(s$file, "html$"), ]
+   # png
+   s <- s[!stringr::str_detect(s$file, "png$"), ]
+   # site_libs
+   s <- s[!stringr::str_detect(s$file, "site_libs"), ]
+   s <- df_to_status(s)
 
    status <- utils::capture.output(print(s))
    status <- c("<pre><code>", status, "</code></pre>")
