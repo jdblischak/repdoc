@@ -182,7 +182,7 @@ get_versions_fig <- function(fig, r, github) {
   template <-
     "
   <details>
-  <summary>Expand here to see past versions of {{fig}}:</summary>
+  <summary><em>Expand here to see past versions of {{fig}}:</em></summary>
   <table style = \"border-collapse:separate; border-spacing:5px;\">
   <thead>
   <tr>

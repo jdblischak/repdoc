@@ -24,10 +24,16 @@ repdoc_html <- function(...) {
     if (git2r::in_repository(".")) {
       r <- git2r::repository(".", discover = TRUE)
 
-      input <- file.path(getwd(), paste0(options$fig.path, options$label,
-                                         "-", options$fig.cur, ".png"))
-      fig_versions <- get_versions_fig(fig = input, r = r,
-                                       github = get_github_from_remote(dirname(input)))
+      input <- file.path(getwd(), x)
+
+      # Need to refactor obtaining repdoc options
+      github = get_github_from_remote(getwd())
+      output_dir <- get_output_dir(directory = getwd())
+      if (!is.null(output_dir)) {
+        input <- file.path(output_dir, x)
+      }
+
+      fig_versions <- get_versions_fig(fig = input, r = r, github = github)
 
       if (fig_versions == "") {
         return(sprintf("![](%s)", x))
