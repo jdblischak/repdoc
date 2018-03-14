@@ -322,10 +322,12 @@ div.tocify {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/jdblischak/repdoc/tree/5e83bdb0cce3c36164db564250c4a8236533f64a" target="_blank">5e83bdb</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/jdblischak/repdoc/tree/58d330c1fe5ca8ad21b135f6486019ea2bd75e20" target="_blank">58d330c</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_commit</code>). repdoc only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
-working directory clean
+Staged changes:
+    Modified:   DESCRIPTION
+
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes. </details>
 </li>
@@ -353,6 +355,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://htmlpreview.github.io/?https://github.com/jdblischak/repdoc/blob/d0b661616455648a5705dc6efe061659b5fedfb5/ex2-website/docs/index.html" target="_blank">d0b6616</a>
+</td>
+<td style="text-align:left;">
+John Blischak
+</td>
+<td style="text-align:left;">
+2018-03-14
+</td>
+<td style="text-align:left;">
+Rebuild HTML with repdoc 0.0.0.9004.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 html
@@ -495,7 +514,7 @@ Add example 2: an R Markdown website
 <p></details></p>
 <hr />
 <pre class="r"><code>getwd()</code></pre>
-<pre><code>[1] &quot;/private/tmp&quot;</code></pre>
+<pre><code>[1] &quot;/tmp&quot;</code></pre>
 <p>Check the seed:</p>
 <pre class="r"><code>rpois(3, lambda = 100)</code></pre>
 <pre><code>[1]  99 108  95</code></pre>
@@ -565,24 +584,33 @@ John Blischak
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.3.2 (2016-10-31)
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: OS X Yosemite 10.10.5
+<pre><code>R version 3.4.3 (2017-11-30)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 17.10
+
+Matrix products: default
+BLAS: /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.7.1
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.7.1
 
 locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
-other attached packages:
-[1] repdoc_0.0.0.9004 rmarkdown_1.9    
-
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14     clisymbols_1.2.0 digest_0.6.13    rprojroot_1.3-2 
- [5] backports_1.1.2  git2r_0.21.0     magrittr_1.5     evaluate_0.10.1 
- [9] stringi_1.1.6    fs_1.1.0         whisker_0.3-2    tools_3.3.2     
-[13] stringr_1.2.0    yaml_2.1.16      htmltools_0.3.6  knitr_1.18      </code></pre>
+ [1] Rcpp_0.12.15      clisymbols_1.2.0  digest_0.6.14    
+ [4] rprojroot_1.3-2   backports_1.1.2   git2r_0.21.0     
+ [7] magrittr_1.5      evaluate_0.10.1   stringi_1.1.6    
+[10] fs_1.1.0.9000     whisker_0.3-2     rmarkdown_1.9    
+[13] tools_3.4.3       stringr_1.3.0     yaml_2.1.18      
+[16] compiler_3.4.3    repdoc_0.0.0.9004 htmltools_0.3.6  
+[19] knitr_1.20       </code></pre>
 </div>
 
 <hr>

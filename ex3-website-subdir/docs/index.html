@@ -322,10 +322,12 @@ div.tocify {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/jdblischak/repdoc/tree/5e83bdb0cce3c36164db564250c4a8236533f64a" target="_blank">5e83bdb</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/jdblischak/repdoc/tree/58d330c1fe5ca8ad21b135f6486019ea2bd75e20" target="_blank">58d330c</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_commit</code>). repdoc only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
-working directory clean
+Staged changes:
+    Modified:   DESCRIPTION
+
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes. </details>
 </li>
@@ -353,6 +355,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://htmlpreview.github.io/?https://github.com/jdblischak/repdoc/blob/d0b661616455648a5705dc6efe061659b5fedfb5/ex3-website-subdir/docs/index.html" target="_blank">d0b6616</a>
+</td>
+<td style="text-align:left;">
+John Blischak
+</td>
+<td style="text-align:left;">
+2018-03-14
+</td>
+<td style="text-align:left;">
+Rebuild HTML with repdoc 0.0.0.9004.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 html
@@ -495,7 +514,7 @@ Add example 3: an R Markdown website with Rmd files in subdirectory
 <p></details></p>
 <hr />
 <pre class="r"><code>getwd()</code></pre>
-<pre><code>[1] &quot;/Users/jdblischak/repos/repdoc/ex3-website-subdir&quot;</code></pre>
+<pre><code>[1] &quot;/home/jdb-work/repos/repdoc/ex3-website-subdir&quot;</code></pre>
 <p>Check the seed:</p>
 <pre class="r"><code>rpois(3, lambda = 100)</code></pre>
 <pre><code>[1]  91  94 100</code></pre>
@@ -565,52 +584,46 @@ John Blischak
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>devtools::session_info()</code></pre>
-<pre><code>─ Session info ──────────────────────────────────────────────────────────
- setting  value                       
- version  R version 3.3.2 (2016-10-31)
- os       OS X Yosemite 10.10.5       
- system   x86_64, darwin13.4.0        
- ui       RStudio                     
+<pre><code>Session info -------------------------------------------------------------</code></pre>
+<pre><code> setting  value                       
+ version  R version 3.4.3 (2017-11-30)
+ system   x86_64, linux-gnu           
+ ui       RStudio (1.1.423)           
  language (EN)                        
  collate  en_US.UTF-8                 
- tz       America/New_York            
- date     2018-03-14                  
-
-─ Packages ──────────────────────────────────────────────────────────────
- package     * version     date       source                         
- assertthat    0.2.0       2017-04-11 CRAN (R 3.3.2)                 
- backports     1.1.2       2017-12-13 cran (@1.1.2)                  
- callr         2.0.2.9001  2018-03-11 Github (r-pkgs/callr@3d39856)  
- cli           1.0.0       2017-11-05 cran (@1.0.0)                  
- clisymbols    1.2.0       2017-05-21 CRAN (R 3.3.2)                 
- crayon        1.3.4       2017-09-16 cran (@1.3.4)                  
- debugme       1.1.0       2017-10-22 cran (@1.1.0)                  
- desc          1.1.1       2017-08-03 cran (@1.1.1)                  
- devtools      1.13.5.9000 2018-03-07 local                          
- digest        0.6.13      2017-12-14 cran (@0.6.13)                 
- evaluate      0.10.1      2017-06-24 cran (@0.10.1)                 
- fs            1.1.0       2018-01-26 CRAN (R 3.3.2)                 
- git2r         0.21.0      2018-01-04 url                            
- htmltools     0.3.6       2017-04-28 cran (@0.3.6)                  
- knitr         1.18        2017-12-27 cran (@1.18)                   
- magrittr      1.5         2014-11-22 cran (@1.5)                    
- memoise       1.1.0       2017-04-21 cran (@1.1.0)                  
- pkgbuild      0.0.0.9000  2018-03-07 Github (r-lib/pkgbuild@2a06839)
- pkgload       1.0.0       2018-03-07 Github (r-lib/pkgload@0cd9f8d) 
- R6            2.2.2       2017-06-17 cran (@2.2.2)                  
- Rcpp          0.12.14     2017-11-23 cran (@0.12.14)                
- repdoc      * 0.0.0.9004  2018-03-14 local                          
- rlang         0.1.6       2017-12-21 cran (@0.1.6)                  
- rmarkdown   * 1.9         2018-03-01 CRAN (R 3.3.2)                 
- rprojroot     1.3-2       2018-01-03 cran (@1.3-2)                  
- sessioninfo   1.0.0       2017-06-21 cran (@1.0.0)                  
- stringi       1.1.6       2017-11-17 cran (@1.1.6)                  
- stringr       1.2.0       2017-02-18 cran (@1.2.0)                  
- testthat      2.0.0       2017-12-13 cran (@2.0.0)                  
- usethis       1.3.0.9000  2018-03-07 Github (r-pkgs/usethis@59b0837)
- whisker       0.3-2       2013-04-28 CRAN (R 3.3.0)                 
- withr         2.1.1.9000  2018-03-11 Github (r-lib/withr@5d05571)   
- yaml          2.1.16      2017-12-12 cran (@2.1.16)                 </code></pre>
+ tz       posixrules                  
+ date     2018-03-14                  </code></pre>
+<pre><code>Packages -----------------------------------------------------------------</code></pre>
+<pre><code> package    * version    date       source                   
+ backports    1.1.2      2017-12-13 CRAN (R 3.4.3)           
+ base       * 3.4.3      2017-12-01 local                    
+ clisymbols   1.2.0      2017-05-21 CRAN (R 3.4.2)           
+ compiler     3.4.3      2017-12-01 local                    
+ datasets   * 3.4.3      2017-12-01 local                    
+ devtools     1.13.5     2018-02-18 CRAN (R 3.4.3)           
+ digest       0.6.14     2018-01-14 cran (@0.6.14)           
+ evaluate     0.10.1     2017-06-24 CRAN (R 3.4.0)           
+ fs           1.1.0.9000 2018-02-22 Github (r-lib/fs@7981c43)
+ git2r        0.21.0     2018-01-04 CRAN (R 3.4.3)           
+ graphics   * 3.4.3      2017-12-01 local                    
+ grDevices  * 3.4.3      2017-12-01 local                    
+ htmltools    0.3.6      2017-04-28 cran (@0.3.6)            
+ knitr        1.20       2018-02-20 cran (@1.20)             
+ magrittr     1.5        2014-11-22 CRAN (R 3.3.0)           
+ memoise      1.1.0      2017-04-21 CRAN (R 3.4.0)           
+ methods    * 3.4.3      2017-12-01 local                    
+ Rcpp         0.12.15    2018-01-20 cran (@0.12.15)          
+ repdoc       0.0.0.9004 2018-03-14 local                    
+ rmarkdown    1.9        2018-03-01 cran (@1.9)              
+ rprojroot    1.3-2      2018-01-03 cran (@1.3-2)            
+ stats      * 3.4.3      2017-12-01 local                    
+ stringi      1.1.6      2017-11-17 cran (@1.1.6)            
+ stringr      1.3.0      2018-02-19 cran (@1.3.0)            
+ tools        3.4.3      2017-12-01 local                    
+ utils      * 3.4.3      2017-12-01 local                    
+ whisker      0.3-2      2013-04-28 CRAN (R 3.3.1)           
+ withr        2.1.1      2017-12-19 CRAN (R 3.4.3)           
+ yaml         2.1.18     2018-03-08 CRAN (R 3.4.3)           </code></pre>
 </div>
 
 <hr>
