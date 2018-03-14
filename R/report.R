@@ -361,7 +361,8 @@ create_objects_table <- function(env) {
   objects <- ls(name = env)
   classes <- vapply(objects, function(x) paste(class(env[[x]]), collapse = ";"),
                     character(1))
-  sizes <- vapply(objects, function(x) format(object.size(env[[x]]), units = "auto"),
+  sizes <- vapply(objects,
+                  function(x) format(utils::object.size(env[[x]]), units = "auto"),
                   character(1))
   df <- data.frame(Name = objects, Class = classes, Size = sizes)
   table <- knitr::kable(df, format = "html", row.names = FALSE)

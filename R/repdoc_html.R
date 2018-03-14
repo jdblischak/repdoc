@@ -197,7 +197,7 @@ repdoc_html <- function(...) {
   pre_processor <- function(metadata, input_file, runtime, knit_meta,
                             files_dir, output_dir) {
     fname_footer <- tempfile("footer", fileext = ".html")
-    repdoc_version <- packageVersion("repdoc")
+    repdoc_version <- utils::packageVersion("repdoc")
     footer <- c("<hr>",
                 "<p>",
                 "This reproducible <a href=\"http://rmarkdown.rstudio.com\">R
