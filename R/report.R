@@ -231,6 +231,18 @@ check_vc <- function(input, output_dir, r, s, github) {
      sha_display <- sha7
    }
    summary <- sprintf("<strong>Repository version:</strong> %s", sha_display)
+   # Scrub HTML and other generated content (e.g. site_libs). It's ok that these
+   # have uncommitted changes.
+   if (!is.null(output_dir)) {
+     s <- status_to_df(s)
+     # Can't start with output directory
+     s <- s[!stringr::str_detect(paste0(git2r::workdir(r), s$file),
+                                 paste0("^", normalizePath(output_dir))), ]
+     # Can't include site_libs
+     s <- s[!stringr::str_detect(s$file, "site_libs"), ]
+     s <- df_to_status(s)
+   }
+
    status <- utils::capture.output(print(s))
    status <- c("<pre><code>", status, "</code></pre>")
    status <- paste(status, collapse = "\n")
@@ -248,7 +260,10 @@ checks the R Markdown file, but you know if there are other scripts or data
 files that it depends on. Below is the status of the Git repository when the
 results were generated:
 "
-                , status)
+                , status,
+"Note that any generated files, e.g. HTML, png, CSS, etc., are not included in
+this status report because it is ok for generated content to have uncommitted
+changes.")
  } else {
    pass <- FALSE
    summary <- "<strong>Repository version:</strong> no version control"

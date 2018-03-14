@@ -69,3 +69,30 @@ to_html <- function(files, outdir = NULL) {
   }
   return(html)
 }
+
+r <- git2r::repository()
+s <- git2r::status(r)
+
+# Convert named nested list to data frame
+status_to_df <- function(s) {
+  stopifnot(class(s) == "git_status")
+  s_vec <- unlist(s)
+  categories <- stringr::str_split(names(s_vec), pattern = "\\.", n = 2,
+                                   simplify = TRUE)
+  d <- data.frame(categories, s_vec, stringsAsFactors = FALSE)
+  colnames(d) <- c("state1", "state2", "file")
+  return(d)
+}
+
+# Convert data frame to git_status
+df_to_status <- function(d) {
+  stopifnot(is.data.frame(d),
+            colnames(d) == c("state1", "state2", "file"))
+  status <- list(staged = list(), unstaged = list(), untracked = list())
+  for (i in seq_along(d$file)) {
+    status[[d$state1[i]]] <- c(status[[d$state1[i]]], list(d$file[i]))
+    names(status[[d$state1[i]]])[length(status[[d$state1[i]]])] <- d$state2[i]
+  }
+  class(status) <- "git_status"
+  return(status)
+}
