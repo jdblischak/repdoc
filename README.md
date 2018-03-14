@@ -14,6 +14,7 @@ control, it implements multiple features to facilitate reproducibility:
 * Organizes the output figure files by the R Markdown file that generated them
 * Reports the status of the Git repository
 * Reports if there were variables defined in the global environment
+* Reports past versions of figure files
 
 This package is for testing features before integrating them into
 [workflowr](https://github.com/jdblischak/workflowr).
