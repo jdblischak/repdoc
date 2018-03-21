@@ -1,7 +1,7 @@
 Package: repdoc
 Type: Package
 Title: Make your R Markdown analysis more reproducible
-Version: 0.0.0.9005
+Version: 0.0.0.9006
 Author: John Blischak
 Maintainer: John Blischak <jdblischak@gmail.com>
 Description: Does the following: 1) sets a seed, 2) inserts version of Git repo,
@@ -13,7 +13,6 @@ Depends:
     R (>= 3.2.5),
     rmarkdown (>= 1.7)
 Imports:
-    clisymbols,
     fs,
     git2r (>= 0.19.0),
     git2r (<= 0.21.0),
