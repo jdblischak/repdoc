@@ -70,9 +70,6 @@ to_html <- function(files, outdir = NULL) {
   return(html)
 }
 
-r <- git2r::repository()
-s <- git2r::status(r)
-
 # Convert named nested list to data frame
 status_to_df <- function(s) {
   stopifnot(class(s) == "git_status")
